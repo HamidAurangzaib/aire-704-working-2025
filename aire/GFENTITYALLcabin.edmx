@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="DB_A61545Model5.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="comprGOOGLBusiness">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Olde_price" Type="float" />
+          <Property Name="New_price" Type="float" />
+          <Property Name="Difference" Type="float" />
+          <Property Name="Cheapest" Type="float" />
+          <Property Name="Cabin" Type="varchar" MaxLength="30" />
+          <Property Name="web" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="comprGOOGLPremium">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Olde_price" Type="float" />
+          <Property Name="New_price" Type="float" />
+          <Property Name="Difference" Type="float" />
+          <Property Name="Cheapest" Type="float" />
+          <Property Name="Cabin" Type="varchar" MaxLength="30" />
+          <Property Name="web" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityContainer Name="DB_A61545Model5StoreContainer">
+          <EntitySet Name="comprGOOGLBusiness" EntityType="Self.comprGOOGLBusiness" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="comprGOOGLPremium" EntityType="Self.comprGOOGLPremium" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DB_A61545Model5" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="comprGOOGLBusiness">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="Olde_price" Type="Double" />
+          <Property Name="New_price" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+          <Property Name="Cheapest" Type="Double" />
+          <Property Name="Cabin" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="web" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="comprGOOGLPremium">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="Olde_price" Type="Double" />
+          <Property Name="New_price" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+          <Property Name="Cheapest" Type="Double" />
+          <Property Name="Cabin" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="web" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="GFEntities18" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="comprGOOGLBusinesses" EntityType="Self.comprGOOGLBusiness" />
+          <EntitySet Name="comprGOOGLPremiums" EntityType="Self.comprGOOGLPremium" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DB_A61545Model5StoreContainer" CdmEntityContainer="GFEntities18">
+          <EntitySetMapping Name="comprGOOGLBusinesses">
+            <EntityTypeMapping TypeName="DB_A61545Model5.comprGOOGLBusiness">
+              <MappingFragment StoreEntitySet="comprGOOGLBusiness">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Olde_price" ColumnName="Olde_price" />
+                <ScalarProperty Name="New_price" ColumnName="New_price" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+                <ScalarProperty Name="Cheapest" ColumnName="Cheapest" />
+                <ScalarProperty Name="Cabin" ColumnName="Cabin" />
+                <ScalarProperty Name="web" ColumnName="web" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="comprGOOGLPremiums">
+            <EntityTypeMapping TypeName="DB_A61545Model5.comprGOOGLPremium">
+              <MappingFragment StoreEntitySet="comprGOOGLPremium">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Olde_price" ColumnName="Olde_price" />
+                <ScalarProperty Name="New_price" ColumnName="New_price" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+                <ScalarProperty Name="Cheapest" ColumnName="Cheapest" />
+                <ScalarProperty Name="Cabin" ColumnName="Cabin" />
+                <ScalarProperty Name="web" ColumnName="web" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

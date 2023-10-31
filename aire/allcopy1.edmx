@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="allcopy1Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="comprGOOGLCOPY1">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Olde_price" Type="float" />
+          <Property Name="New_price" Type="float" />
+          <Property Name="Difference" Type="float" />
+          <Property Name="Cheapest" Type="float" />
+          <Property Name="Cabin" Type="varchar" MaxLength="30" />
+          <Property Name="web" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="comprskyCOPY1">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Olde_price" Type="float" />
+          <Property Name="New_price" Type="float" />
+          <Property Name="Difference" Type="float" />
+          <Property Name="Cheapest" Type="float" />
+          <Property Name="Cabin" Type="varchar" MaxLength="30" />
+          <Property Name="web" Type="varchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="tablXCOPY1">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Old_prie_Google" Type="float" />
+          <Property Name="New_prie_Google" Type="float" />
+          <Property Name="Difference_Google" Type="float" />
+          <Property Name="Cheapest_filght" Type="float" />
+          <Property Name="Web_Google" Type="varchar" MaxLength="500" />
+          <Property Name="Cabin_filght" Type="varchar" MaxLength="30" />
+          <Property Name="Old_prie_Skyscanner" Type="float" />
+          <Property Name="New_prie_Skyscanner" Type="float" />
+          <Property Name="Difference_Skyscanner" Type="float" />
+          <Property Name="Cheapest_Skyscanner" Type="float" />
+          <Property Name="Web_Skyscanner" Type="varchar" MaxLength="500" />
+          <Property Name="Cabin_skayscanner" Type="varchar" MaxLength="30" />
+        </EntityType>
+        <EntityContainer Name="allcopy1ModelStoreContainer">
+          <EntitySet Name="comprGOOGLCOPY1" EntityType="Self.comprGOOGLCOPY1" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="comprskyCOPY1" EntityType="Self.comprskyCOPY1" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tablXCOPY1" EntityType="Self.tablXCOPY1" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="allcopy1Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="comprGOOGLCOPY1">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="Olde_price" Type="Double" />
+          <Property Name="New_price" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+          <Property Name="Cheapest" Type="Double" />
+          <Property Name="Cabin" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="web" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="comprskyCOPY1">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="Olde_price" Type="Double" />
+          <Property Name="New_price" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+          <Property Name="Cheapest" Type="Double" />
+          <Property Name="Cabin" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="web" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="tablXCOPY1">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="Old_prie_Google" Type="Double" />
+          <Property Name="New_prie_Google" Type="Double" />
+          <Property Name="Difference_Google" Type="Double" />
+          <Property Name="Cheapest_filght" Type="Double" />
+          <Property Name="Web_Google" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Cabin_filght" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Old_prie_Skyscanner" Type="Double" />
+          <Property Name="New_prie_Skyscanner" Type="Double" />
+          <Property Name="Difference_Skyscanner" Type="Double" />
+          <Property Name="Cheapest_Skyscanner" Type="Double" />
+          <Property Name="Web_Skyscanner" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Cabin_skayscanner" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="allcopoy1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="comprGOOGLCOPY1" EntityType="Self.comprGOOGLCOPY1" />
+          <EntitySet Name="comprskyCOPY1" EntityType="Self.comprskyCOPY1" />
+          <EntitySet Name="tablXCOPY1" EntityType="Self.tablXCOPY1" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="allcopy1ModelStoreContainer" CdmEntityContainer="allcopoy1">
+          <EntitySetMapping Name="comprGOOGLCOPY1">
+            <EntityTypeMapping TypeName="allcopy1Model.comprGOOGLCOPY1">
+              <MappingFragment StoreEntitySet="comprGOOGLCOPY1">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Olde_price" ColumnName="Olde_price" />
+                <ScalarProperty Name="New_price" ColumnName="New_price" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+                <ScalarProperty Name="Cheapest" ColumnName="Cheapest" />
+                <ScalarProperty Name="Cabin" ColumnName="Cabin" />
+                <ScalarProperty Name="web" ColumnName="web" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="comprskyCOPY1">
+            <EntityTypeMapping TypeName="allcopy1Model.comprskyCOPY1">
+              <MappingFragment StoreEntitySet="comprskyCOPY1">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Olde_price" ColumnName="Olde_price" />
+                <ScalarProperty Name="New_price" ColumnName="New_price" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+                <ScalarProperty Name="Cheapest" ColumnName="Cheapest" />
+                <ScalarProperty Name="Cabin" ColumnName="Cabin" />
+                <ScalarProperty Name="web" ColumnName="web" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tablXCOPY1">
+            <EntityTypeMapping TypeName="allcopy1Model.tablXCOPY1">
+              <MappingFragment StoreEntitySet="tablXCOPY1">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Old_prie_Google" ColumnName="Old_prie_Google" />
+                <ScalarProperty Name="New_prie_Google" ColumnName="New_prie_Google" />
+                <ScalarProperty Name="Difference_Google" ColumnName="Difference_Google" />
+                <ScalarProperty Name="Cheapest_filght" ColumnName="Cheapest_filght" />
+                <ScalarProperty Name="Web_Google" ColumnName="Web_Google" />
+                <ScalarProperty Name="Cabin_filght" ColumnName="Cabin_filght" />
+                <ScalarProperty Name="Old_prie_Skyscanner" ColumnName="Old_prie_Skyscanner" />
+                <ScalarProperty Name="New_prie_Skyscanner" ColumnName="New_prie_Skyscanner" />
+                <ScalarProperty Name="Difference_Skyscanner" ColumnName="Difference_Skyscanner" />
+                <ScalarProperty Name="Cheapest_Skyscanner" ColumnName="Cheapest_Skyscanner" />
+                <ScalarProperty Name="Web_Skyscanner" ColumnName="Web_Skyscanner" />
+                <ScalarProperty Name="Cabin_skayscanner" ColumnName="Cabin_skayscanner" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

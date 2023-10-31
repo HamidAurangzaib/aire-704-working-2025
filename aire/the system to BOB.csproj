@@ -1,0 +1,1344 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{87F1391B-5DE1-4428-BE2D-2B0F5C36ED7E}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>aire</RootNamespace>
+    <AssemblyName>aire</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>C:\publishMyWin705\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>51</ApplicationRevision>
+    <ApplicationVersion>4.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Martz90-Circle-Addon2-Plane-flight.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>B113F25A51BC30038024FBB6F31591914603922B</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>aire_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>aire.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestTimestampUrl>
+    </ManifestTimestampUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ClosedXML, Version=0.95.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClosedXML.0.95.0\lib\net46\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.7.2.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.7.2\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.3.6.0\lib\net45\ExcelDataReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.DataSet.3.6.0\lib\net35\ExcelDataReader.DataSet.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelNumberFormat, Version=1.0.10.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelNumberFormat.1.0.10\lib\net20\ExcelNumberFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="Remotion.Linq, Version=2.2.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Remotion.Linq.2.2.0\lib\net45\Remotion.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.FileSystem.Primitives.4.0.1\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Packaging, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Packaging.4.0.0\lib\net46\System.IO.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="Z.Dapper.Plus, Version=6.0.4.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.Dapper.Plus.6.0.4\lib\net45\Z.Dapper.Plus.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="addDATA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="addDATA.Designer.cs">
+      <DependentUpon>addDATA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="addFares.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="addFares.Designer.cs">
+      <DependentUpon>addFares.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ado.cs" />
+    <Compile Include="aftereachitx.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="aftereachitx.Designer.cs">
+      <DependentUpon>aftereachitx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="airlin.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>airlin.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="airlin.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>airlin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="airlin.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>airlin.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="airline.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="airline.Designer.cs">
+      <DependentUpon>airline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AllCabin.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AllCabin.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AllCabin.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AllCabin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AllCabin.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AllCabin.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="allcopy.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>allcopy.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="allcopy.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>allcopy.tt</DependentUpon>
+    </Compile>
+    <Compile Include="allcopy.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>allcopy.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="allcopy1.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>allcopy1.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="allcopy1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>allcopy1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="allcopy1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>allcopy1.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="allGFcabin.cs">
+      <DependentUpon>AllCabin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ClassCalendarOutput.cs" />
+    <Compile Include="ClassTripadvisor.cs" />
+    <Compile Include="ClassDomestic.cs" />
+    <Compile Include="ClassFares.cs" />
+    <Compile Include="classGF.cs" />
+    <Compile Include="classGFAirline.cs" />
+    <Compile Include="ClassDisney.cs" />
+    <Compile Include="ClassHotel.cs" />
+    <Compile Include="ClassITXAirlinOutput.cs" />
+    <Compile Include="ClassTAX.cs" />
+    <Compile Include="cmrpGF.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cmrpGF.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="cmrpGF.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cmrpGF.tt</DependentUpon>
+    </Compile>
+    <Compile Include="cmrpGF.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cmrpGF.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="code airline.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="code airline.Designer.cs">
+      <DependentUpon>code airline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="codeAirline.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="codeAirline.Designer.cs">
+      <DependentUpon>codeAirline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="compare itx with fare.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="compare itx with fare.Designer.cs">
+      <DependentUpon>compare itx with fare.cs</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGL.cs">
+      <DependentUpon>cmrpGF.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGL14Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGL2Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGL3Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGL4Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGLBusiness.cs">
+      <DependentUpon>GFENTITYALLcabin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGLCOPY.cs">
+      <DependentUpon>allcopy.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGLCOPY1.cs">
+      <DependentUpon>allcopy1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprGOOGLPremium.cs">
+      <DependentUpon>GFENTITYALLcabin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprsky.cs">
+      <DependentUpon>SKYS.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprsky14Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprsky2Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprsky3Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprsky4Days.cs">
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprskyCOPY.cs">
+      <DependentUpon>allcopy.tt</DependentUpon>
+    </Compile>
+    <Compile Include="comprskyCOPY1.cs">
+      <DependentUpon>allcopy1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="doestic1.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>doestic1.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="doestic1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>doestic1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="doestic1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>doestic1.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="eachitx.cs">
+      <DependentUpon>teffahi.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_itx_both.cs">
+      <DependentUpon>zakte.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_output.cs">
+      <DependentUpon>zak1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_outputALL.cs">
+      <DependentUpon>AllCabin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_outputB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>each_outputB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_outputB.cs">
+      <DependentUpon>each_outputB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_outputB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>each_outputB.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="each_outputB1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>each_outputB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_outputP.cs">
+      <DependentUpon>each_outputB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="each_output_all_cabin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="each_output_all_cabin.Designer.cs">
+      <DependentUpon>each_output_all_cabin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="easyjet.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GF Hotel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GF Hotel.Designer.cs">
+      <DependentUpon>GF Hotel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GF SKYS USA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GF SKYS USA.Designer.cs">
+      <DependentUpon>GF SKYS USA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GFENTITYALLcabin.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GFENTITYALLcabin.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GFENTITYALLcabin.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GFENTITYALLcabin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GFENTITYALLcabin.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GFENTITYALLcabin.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="google usa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="google usa.Designer.cs">
+      <DependentUpon>google usa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GoogleAirline.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GoogleAirline.Designer.cs">
+      <DependentUpon>GoogleAirline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="googleF.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="googleF.Designer.cs">
+      <DependentUpon>googleF.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GOOGLE_SKYS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GOOGLE_SKYS.Designer.cs">
+      <DependentUpon>GOOGLE_SKYS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="groupcode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="groupcode.Designer.cs">
+      <DependentUpon>groupcode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="holidays.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="holidays.Designer.cs">
+      <DependentUpon>holidays.cs</DependentUpon>
+    </Compile>
+    <Compile Include="holidays_google.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="holidays_google.Designer.cs">
+      <DependentUpon>holidays_google.cs</DependentUpon>
+    </Compile>
+    <Compile Include="home.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="home.Designer.cs">
+      <DependentUpon>home.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Disney.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Disney.Designer.cs">
+      <DependentUpon>Disney.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageUpload.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageUpload.Designer.cs">
+      <DependentUpon>ImageUpload.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Information about files.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Information about files.Designer.cs">
+      <DependentUpon>Information about files.cs</DependentUpon>
+    </Compile>
+    <Compile Include="interim.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="interim.Designer.cs">
+      <DependentUpon>interim.cs</DependentUpon>
+    </Compile>
+    <Compile Include="itxairline.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="itxairline.Designer.cs">
+      <DependentUpon>itxairline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="itx_both.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="itx_both.Designer.cs">
+      <DependentUpon>itx_both.cs</DependentUpon>
+    </Compile>
+    <Compile Include="JET2HOLIDAYS.cs" />
+    <Compile Include="new flight with sky.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="new flight with sky.Designer.cs">
+      <DependentUpon>new flight with sky.cs</DependentUpon>
+    </Compile>
+    <Compile Include="new flight with skycopy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="new flight with skycopy.Designer.cs">
+      <DependentUpon>new flight with skycopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NEW SKYS GF USA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NEW SKYS GF USA.Designer.cs">
+      <DependentUpon>NEW SKYS GF USA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="newskyflight.cs">
+      <DependentUpon>quick.tt</DependentUpon>
+    </Compile>
+    <Compile Include="output.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="output.Designer.cs">
+      <DependentUpon>output.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="quick.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>quick.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="quick.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>quick.tt</DependentUpon>
+    </Compile>
+    <Compile Include="quick.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>quick.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="quickSkayskanner.cs" />
+    <Compile Include="quicksky.cs">
+      <DependentUpon>quick.tt</DependentUpon>
+    </Compile>
+    <Compile Include="quickskys.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="quickskys.Designer.cs">
+      <DependentUpon>quickskys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rechirch itx output.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="rechirch itx output.Designer.cs">
+      <DependentUpon>rechirch itx output.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search GF all cabin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Search GF all cabin.Designer.cs">
+      <DependentUpon>Search GF all cabin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search SKYS GF USA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Search SKYS GF USA.Designer.cs">
+      <DependentUpon>Search SKYS GF USA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search USA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Search USA.Designer.cs">
+      <DependentUpon>Search USA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search_Easyjet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Search_Easyjet.Designer.cs">
+      <DependentUpon>Search_Easyjet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search_Jet2holidays.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Search_Jet2holidays.Designer.cs">
+      <DependentUpon>Search_Jet2holidays.cs</DependentUpon>
+    </Compile>
+    <Compile Include="search_skys_flight.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="search_skys_flight.Designer.cs">
+      <DependentUpon>search_skys_flight.cs</DependentUpon>
+    </Compile>
+    <Compile Include="search_skys_flight_copy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="search_skys_flight_copy.Designer.cs">
+      <DependentUpon>search_skys_flight_copy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="search UK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="search UK.Designer.cs">
+      <DependentUpon>search UK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Hotel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Hotel.Designer.cs">
+      <DependentUpon>Hotel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Serch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Serch.Designer.cs">
+      <DependentUpon>Serch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Skayskanner.cs" />
+    <Compile Include="sky.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="sky.Designer.cs">
+      <DependentUpon>sky.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SKYS USA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SKYS USA.Designer.cs">
+      <DependentUpon>SKYS USA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SKYS.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SKYS.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SKYS.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SKYS.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SKYS.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SKYS.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Srch_Hotel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Srch_Hotel.Designer.cs">
+      <DependentUpon>Srch_Hotel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="t.cs">
+      <DependentUpon>airlin.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tablx.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>tablx.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tablX.cs">
+      <DependentUpon>tablx.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tablx.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>tablx.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="tablx1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>tablx.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tablXCOPY.cs">
+      <DependentUpon>allcopy.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tablXCOPY1.cs">
+      <DependentUpon>allcopy1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="target.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="target.Designer.cs">
+      <DependentUpon>target.cs</DependentUpon>
+    </Compile>
+    <Compile Include="teffahi.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>teffahi.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="teffahi.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>teffahi.tt</DependentUpon>
+    </Compile>
+    <Compile Include="teffahi.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>teffahi.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="ulpoad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ulpoad.Designer.cs">
+      <DependentUpon>ulpoad.cs</DependentUpon>
+    </Compile>
+    <Compile Include="updatequick.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="updatequick.Designer.cs">
+      <DependentUpon>updatequick.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload for Skyscanner.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload for Skyscanner.Designer.cs">
+      <DependentUpon>upload for Skyscanner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload gf domestic target.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload gf domestic target.Designer.cs">
+      <DependentUpon>upload gf domestic target.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload target.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload target.Designer.cs">
+      <DependentUpon>upload target.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload_Tripadvisor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload_Tripadvisor.Designer.cs">
+      <DependentUpon>upload_Tripadvisor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload_Disney.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload_Disney.Designer.cs">
+      <DependentUpon>upload_Disney.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload_FG_Airline.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload_FG_Airline.Designer.cs">
+      <DependentUpon>upload_FG_Airline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="upload_holiday.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="upload_holiday.Designer.cs">
+      <DependentUpon>upload_holiday.cs</DependentUpon>
+    </Compile>
+    <Compile Include="zak1.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zak1.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="zak1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zak1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="zak1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zak1.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="zakte.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zakte.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="zakte.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zakte.tt</DependentUpon>
+    </Compile>
+    <Compile Include="zakte.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zakte.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="google_copy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="google_copy.Designer.cs">
+      <DependentUpon>google_copy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="google_skys_copy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="google_skys_copy.Designer.cs">
+      <DependentUpon>google_skys_copy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SkysCopy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SkysCopy.Designer.cs">
+      <DependentUpon>SkysCopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="add hotel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="add hotel.Designer.cs">
+      <DependentUpon>add hotel.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="add hotel.resx">
+      <DependentUpon>add hotel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="each_output_all_cabin.resx">
+      <DependentUpon>each_output_all_cabin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GF Hotel.resx">
+      <DependentUpon>GF Hotel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GF SKYS USA.resx">
+      <DependentUpon>GF SKYS USA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="google usa.resx">
+      <DependentUpon>google usa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GoogleAirline.resx">
+      <DependentUpon>GoogleAirline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="holidays.resx">
+      <DependentUpon>holidays.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="holidays_google.resx">
+      <DependentUpon>holidays_google.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Disney.resx">
+      <DependentUpon>Disney.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageUpload.resx">
+      <DependentUpon>ImageUpload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="new flight with skycopy.resx">
+      <DependentUpon>new flight with skycopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NEW SKYS GF USA.resx">
+      <DependentUpon>NEW SKYS GF USA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Search GF all cabin.resx">
+      <DependentUpon>Search GF all cabin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Search SKYS GF USA.resx">
+      <DependentUpon>Search SKYS GF USA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Search USA.resx">
+      <DependentUpon>Search USA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Search_Easyjet.resx">
+      <DependentUpon>Search_Easyjet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Search_Jet2holidays.resx">
+      <DependentUpon>Search_Jet2holidays.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SKYS USA.resx">
+      <DependentUpon>SKYS USA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SkysCopy.resx">
+      <DependentUpon>SkysCopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="google_skys_copy.resx">
+      <DependentUpon>google_skys_copy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="google_copy.resx">
+      <DependentUpon>google_copy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="addDATA.resx">
+      <DependentUpon>addDATA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="addFares.resx">
+      <DependentUpon>addFares.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="aftereachitx.resx">
+      <DependentUpon>aftereachitx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="airline.resx">
+      <DependentUpon>airline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="code airline.resx">
+      <DependentUpon>code airline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="codeAirline.resx">
+      <DependentUpon>codeAirline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="compare itx with fare.resx">
+      <DependentUpon>compare itx with fare.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="googleF.resx">
+      <DependentUpon>googleF.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GOOGLE_SKYS.resx">
+      <DependentUpon>GOOGLE_SKYS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="groupcode.resx">
+      <DependentUpon>groupcode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="home.resx">
+      <DependentUpon>home.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Information about files.resx">
+      <DependentUpon>Information about files.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="interim.resx">
+      <DependentUpon>interim.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="itxairline.resx">
+      <DependentUpon>itxairline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="itx_both.resx">
+      <DependentUpon>itx_both.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="new flight with sky.resx">
+      <DependentUpon>new flight with sky.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="output.resx">
+      <DependentUpon>output.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="quickskys.resx">
+      <DependentUpon>quickskys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rechirch itx output.resx">
+      <DependentUpon>rechirch itx output.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="search_skys_flight.resx">
+      <DependentUpon>search_skys_flight.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="search_skys_flight_copy.resx">
+      <DependentUpon>search_skys_flight_copy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="search UK.resx">
+      <DependentUpon>search UK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Hotel.resx">
+      <DependentUpon>Hotel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Serch.resx">
+      <DependentUpon>Serch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sky.resx">
+      <DependentUpon>sky.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Srch_Hotel.resx">
+      <DependentUpon>Srch_Hotel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="target.resx">
+      <DependentUpon>target.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ulpoad.resx">
+      <DependentUpon>ulpoad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="updatequick.resx">
+      <DependentUpon>updatequick.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload for Skyscanner.resx">
+      <DependentUpon>upload for Skyscanner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload gf domestic target.resx">
+      <DependentUpon>upload gf domestic target.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload target.resx">
+      <DependentUpon>upload target.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload_Tripadvisor.resx">
+      <DependentUpon>upload_Tripadvisor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload_Disney.resx">
+      <DependentUpon>upload_Disney.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload_FG_Airline.resx">
+      <DependentUpon>upload_FG_Airline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="upload_holiday.resx">
+      <DependentUpon>upload_holiday.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="aire_TemporaryKey.pfx" />
+    <EntityDeploy Include="cmrpGF.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>cmrpGF.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="airlin.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>airlin.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="airlin.edmx.diagram">
+      <DependentUpon>airlin.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="allcopy.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>allcopy.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="AllCabin.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>AllCabin.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="AllCabin.edmx.diagram">
+      <DependentUpon>AllCabin.edmx</DependentUpon>
+    </None>
+    <None Include="allcopy.edmx.diagram">
+      <DependentUpon>allcopy.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="allcopy1.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>allcopy1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="allcopy1.edmx.diagram">
+      <DependentUpon>allcopy1.edmx</DependentUpon>
+    </None>
+    <None Include="cmrpGF.edmx.diagram">
+      <DependentUpon>cmrpGF.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="each_outputB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>each_outputB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="doestic1.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>doestic1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="doestic1.edmx.diagram">
+      <DependentUpon>doestic1.edmx</DependentUpon>
+    </None>
+    <None Include="each_outputB.edmx.diagram">
+      <DependentUpon>each_outputB.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="GFENTITYALLcabin.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>GFENTITYALLcabin.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="GFENTITYALLcabin.edmx.diagram">
+      <DependentUpon>GFENTITYALLcabin.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EntityDeploy Include="zak1.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>zak1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="teffahi.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>teffahi.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="SKYS.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>SKYS.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="quick.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>quick.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="quick.edmx.diagram">
+      <DependentUpon>quick.edmx</DependentUpon>
+    </None>
+    <None Include="SKYS.edmx.diagram">
+      <DependentUpon>SKYS.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="tablx.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>tablx.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="tablx.edmx.diagram">
+      <DependentUpon>tablx.edmx</DependentUpon>
+    </None>
+    <None Include="teffahi.edmx.diagram">
+      <DependentUpon>teffahi.edmx</DependentUpon>
+    </None>
+    <None Include="zak1.edmx.diagram">
+      <DependentUpon>zak1.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="zakte.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>zakte.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="zakte.edmx.diagram">
+      <DependentUpon>zakte.edmx</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\logo-text-flight-skyscanner-technology-line-review-skyscanner-ltd-png-clip-art.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\travel-agent-hotel-flight-airline-ticket-travel.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\travel-agent-hotel-flight-airline-ticket-travel1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\google-flights-1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="airlin.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>airlin.edmx</DependentUpon>
+      <LastGenOutput>airlin.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="airlin.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>airlin.edmx</DependentUpon>
+      <LastGenOutput>airlin.cs</LastGenOutput>
+    </Content>
+    <Content Include="AllCabin.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>AllCabin.edmx</DependentUpon>
+      <LastGenOutput>AllCabin.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="AllCabin.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>AllCabin.edmx</DependentUpon>
+      <LastGenOutput>AllCabin.cs</LastGenOutput>
+    </Content>
+    <Content Include="allcopy.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>allcopy.edmx</DependentUpon>
+      <LastGenOutput>allcopy.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="allcopy.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>allcopy.edmx</DependentUpon>
+      <LastGenOutput>allcopy.cs</LastGenOutput>
+    </Content>
+    <Content Include="allcopy1.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>allcopy1.edmx</DependentUpon>
+      <LastGenOutput>allcopy1.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="allcopy1.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>allcopy1.edmx</DependentUpon>
+      <LastGenOutput>allcopy1.cs</LastGenOutput>
+    </Content>
+    <Content Include="cmrpGF.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>cmrpGF.edmx</DependentUpon>
+      <LastGenOutput>cmrpGF.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="cmrpGF.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>cmrpGF.edmx</DependentUpon>
+      <LastGenOutput>cmrpGF.cs</LastGenOutput>
+    </Content>
+    <Content Include="doestic1.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>doestic1.edmx</DependentUpon>
+      <LastGenOutput>doestic1.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="doestic1.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>doestic1.edmx</DependentUpon>
+      <LastGenOutput>doestic1.cs</LastGenOutput>
+    </Content>
+    <Content Include="each_outputB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>each_outputB.edmx</DependentUpon>
+      <LastGenOutput>each_outputB.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="each_outputB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>each_outputB.edmx</DependentUpon>
+      <LastGenOutput>each_outputB1.cs</LastGenOutput>
+    </Content>
+    <Content Include="GFENTITYALLcabin.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>GFENTITYALLcabin.edmx</DependentUpon>
+      <LastGenOutput>GFENTITYALLcabin.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="GFENTITYALLcabin.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>GFENTITYALLcabin.edmx</DependentUpon>
+      <LastGenOutput>GFENTITYALLcabin.cs</LastGenOutput>
+    </Content>
+    <Content Include="Martz90-Circle-Addon2-Plane-flight.ico" />
+    <Content Include="quick.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>quick.edmx</DependentUpon>
+      <LastGenOutput>quick.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="quick.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>quick.edmx</DependentUpon>
+      <LastGenOutput>quick.cs</LastGenOutput>
+    </Content>
+    <Content Include="SKYS.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SKYS.edmx</DependentUpon>
+      <LastGenOutput>SKYS.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="SKYS.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SKYS.edmx</DependentUpon>
+      <LastGenOutput>SKYS.cs</LastGenOutput>
+    </Content>
+    <Content Include="tablx.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>tablx.edmx</DependentUpon>
+      <LastGenOutput>tablx.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="tablx.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>tablx.edmx</DependentUpon>
+      <LastGenOutput>tablx1.cs</LastGenOutput>
+    </Content>
+    <Content Include="teffahi.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>teffahi.edmx</DependentUpon>
+      <LastGenOutput>teffahi.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="teffahi.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>teffahi.edmx</DependentUpon>
+      <LastGenOutput>teffahi.cs</LastGenOutput>
+    </Content>
+    <Content Include="zak1.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>zak1.edmx</DependentUpon>
+      <LastGenOutput>zak1.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="zak1.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>zak1.edmx</DependentUpon>
+      <LastGenOutput>zak1.cs</LastGenOutput>
+    </Content>
+    <Content Include="zakte.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>zakte.edmx</DependentUpon>
+      <LastGenOutput>zakte.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="zakte.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>zakte.edmx</DependentUpon>
+      <LastGenOutput>zakte.cs</LastGenOutput>
+    </Content>
+    <None Include="Resources\Lol_question_mark.png" />
+    <Content Include="Resources\travel-world-travel-agent-hotel-vacation-tourism-tripadvisor-travel-insurance-road-trip-png-clipart.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>4</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>6</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

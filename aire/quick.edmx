@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="quickModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="newskyflight">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Price_Flight" Type="float" />
+          <Property Name="Price_Skyscanner" Type="float" />
+          <Property Name="Difference" Type="float" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'DB_A61545_andycom.dbo.newskyflightcopy' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="newskyflightcopy">
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="Price_Flight" Type="float" />
+          <Property Name="Price_Skyscanner" Type="float" />
+          <Property Name="Difference" Type="float" />
+        </EntityType>-->
+        <EntityType Name="quicksky">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="20" />
+          <Property Name="To" Type="varchar" MaxLength="20" />
+          <Property Name="city" Type="varchar" MaxLength="40" />
+          <Property Name="Dates" Type="date" />
+          <Property Name="stops" Type="varchar" MaxLength="40" />
+          <Property Name="New_Price" Type="float" />
+          <Property Name="Old_Price" Type="float" />
+          <Property Name="Difference" Type="float" />
+          <Property Name="Cheapset" Type="float" />
+        </EntityType>
+        <EntityContainer Name="quickModelStoreContainer">
+          <EntitySet Name="newskyflight" EntityType="Self.newskyflight" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="quicksky" EntityType="Self.quicksky" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="quickModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="newskyflight">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="Price_Flight" Type="Double" />
+          <Property Name="Price_Skyscanner" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+        </EntityType>
+        <EntityType Name="quicksky">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="city" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="DateTime" Precision="0" />
+          <Property Name="stops" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="New_Price" Type="Double" />
+          <Property Name="Old_Price" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+          <Property Name="Cheapset" Type="Double" />
+        </EntityType>
+        <EntityContainer Name="quicknewEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="newskyflights" EntityType="Self.newskyflight" />
+          <EntitySet Name="quickskies" EntityType="Self.quicksky" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="quickModelStoreContainer" CdmEntityContainer="quicknewEntities">
+          <EntitySetMapping Name="newskyflights">
+            <EntityTypeMapping TypeName="quickModel.newskyflight">
+              <MappingFragment StoreEntitySet="newskyflight">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Price_Flight" ColumnName="Price_Flight" />
+                <ScalarProperty Name="Price_Skyscanner" ColumnName="Price_Skyscanner" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="quickskies">
+            <EntityTypeMapping TypeName="quickModel.quicksky">
+              <MappingFragment StoreEntitySet="quicksky">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="city" ColumnName="city" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="stops" ColumnName="stops" />
+                <ScalarProperty Name="New_Price" ColumnName="New_Price" />
+                <ScalarProperty Name="Old_Price" ColumnName="Old_Price" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+                <ScalarProperty Name="Cheapset" ColumnName="Cheapset" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

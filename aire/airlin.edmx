@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="airlineModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="t">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="From" Type="varchar" MaxLength="30" />
+          <Property Name="Via" Type="varchar" MaxLength="30" />
+          <Property Name="To" Type="varchar" MaxLength="30" />
+          <Property Name="citys" Type="varchar" MaxLength="40" />
+          <Property Name="Airlin" Type="varchar" MaxLength="30" />
+          <Property Name="Olde_price" Type="float" />
+          <Property Name="New_price" Type="float" />
+          <Property Name="Difference" Type="float" />
+          <Property Name="Cheapest" Type="float" />
+          <Property Name="Total_Tax" Type="float" />
+          <Property Name="Total_amount" Type="float" />
+          <Property Name="Class" Type="varchar" MaxLength="30" />
+          <Property Name="Dates" Type="varchar" MaxLength="30" />
+          <Property Name="Cabin" Type="varchar" MaxLength="30" />
+          <Property Name="TAX1" Type="float" />
+          <Property Name="Tcode1" Type="varchar" MaxLength="30" />
+          <Property Name="TAX2" Type="float" />
+          <Property Name="Tcode2" Type="varchar" MaxLength="30" />
+          <Property Name="TAX3" Type="float" />
+          <Property Name="Tcode3" Type="varchar" MaxLength="30" />
+          <Property Name="Farebasis" Type="varchar" MaxLength="30" />
+          <Property Name="Season" Type="varchar" MaxLength="30" />
+        </EntityType>
+        <EntityContainer Name="airlineModelStoreContainer">
+          <EntitySet Name="t" EntityType="Self.t" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="airlineModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="t">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="From" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Via" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="To" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="citys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Airlin" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Olde_price" Type="Double" />
+          <Property Name="New_price" Type="Double" />
+          <Property Name="Difference" Type="Double" />
+          <Property Name="Cheapest" Type="Double" />
+          <Property Name="Total_Tax" Type="Double" />
+          <Property Name="Total_amount" Type="Double" />
+          <Property Name="Class" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Dates" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Cabin" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TAX1" Type="Double" />
+          <Property Name="Tcode1" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TAX2" Type="Double" />
+          <Property Name="Tcode2" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TAX3" Type="Double" />
+          <Property Name="Tcode3" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Farebasis" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Season" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="airlinEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="t" EntityType="Self.t" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="airlineModelStoreContainer" CdmEntityContainer="airlinEntities">
+          <EntitySetMapping Name="t">
+            <EntityTypeMapping TypeName="airlineModel.t">
+              <MappingFragment StoreEntitySet="t">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="Via" ColumnName="Via" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="citys" ColumnName="citys" />
+                <ScalarProperty Name="Airlin" ColumnName="Airlin" />
+                <ScalarProperty Name="Olde_price" ColumnName="Olde_price" />
+                <ScalarProperty Name="New_price" ColumnName="New_price" />
+                <ScalarProperty Name="Difference" ColumnName="Difference" />
+                <ScalarProperty Name="Cheapest" ColumnName="Cheapest" />
+                <ScalarProperty Name="Total_Tax" ColumnName="Total_Tax" />
+                <ScalarProperty Name="Total_amount" ColumnName="Total_amount" />
+                <ScalarProperty Name="Class" ColumnName="Class" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Cabin" ColumnName="Cabin" />
+                <ScalarProperty Name="TAX1" ColumnName="TAX1" />
+                <ScalarProperty Name="Tcode1" ColumnName="Tcode1" />
+                <ScalarProperty Name="TAX2" ColumnName="TAX2" />
+                <ScalarProperty Name="Tcode2" ColumnName="Tcode2" />
+                <ScalarProperty Name="TAX3" ColumnName="TAX3" />
+                <ScalarProperty Name="Tcode3" ColumnName="Tcode3" />
+                <ScalarProperty Name="Farebasis" ColumnName="Farebasis" />
+                <ScalarProperty Name="Season" ColumnName="Season" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
