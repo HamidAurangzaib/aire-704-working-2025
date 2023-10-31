@@ -100,7 +100,39 @@ namespace aire
             }
             catch { }
         }
+        private void fnctionSreachDates(string nameProc, string value1, string value2)
+        {
+            if (value1 == "FROM") value1 = "";
+            d.dt.Rows.Clear();
+            d.cmdd.Parameters.Clear();
+            dataGridView2.Rows.Clear();
+            d.cmdd.CommandType = CommandType.StoredProcedure;
+            d.cmdd.CommandText = "" + nameProc + "";
+            d.cmdd.Parameters.Add("@Date1", SqlDbType.Date).Value = value1;
+            d.cmdd.Parameters.Add("@Date2", SqlDbType.Date).Value = value2;
+            
+            d.cmdd.Connection = d.cn;
 
+            d.dt.Load(d.cmdd.ExecuteReader());
+
+            int cnt = d.dt.Rows.Count;
+            if (cnt == 0)
+            {
+                MessageBox.Show("The information entered is not on the database!");
+            }
+            for (int i = 0; i < cnt; i++)
+            {
+
+                dataGridView2.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), d.dt.Rows[i][3].ToString(),
+                      d.dt.Rows[i][4].ToString(), DateTime.Parse(d.dt.Rows[i][5].ToString()), DateTime.Parse(d.dt.Rows[i][6].ToString()), d.dt.Rows[i][7].ToString(),
+                      double.Parse(d.dt.Rows[i][8].ToString()), double.Parse(d.dt.Rows[i][9].ToString()), double.Parse(d.dt.Rows[i][10].ToString()), d.dt.Rows[i][11].ToString(),
+                      d.dt.Rows[i][12].ToString(), int.Parse(d.dt.Rows[i][13].ToString()), int.Parse(d.dt.Rows[i][14].ToString()),
+                      d.dt.Rows[i][15].ToString(), d.dt.Rows[i][16].ToString(), d.dt.Rows[i][17].ToString(), d.dt.Rows[i][19].ToString(),
+                      d.dt.Rows[i][20].ToString(), DateTime.Parse(d.dt.Rows[i][21].ToString()), d.dt.Rows[i][18].ToString());
+
+            }
+            datagridvColor();
+        }
         private void fnctionSreach(string nameProc,string value1, string value2,int nbr1,int nbr2)
         {
             if (value1 == "FROM") value1 = "";
@@ -222,7 +254,7 @@ namespace aire
 
         private void button2_Click(object sender, EventArgs e)
         {
-            fnctionSreach("SearchDate", dateTimePicker1.Value.ToString("yyyy/MM/dd"), "", 1, 0);
+            fnctionSreachDates("SearchDate", dateTimePicker1.Value.ToString("yyyy/MM/dd"), dateTimePicker3.Value.ToString("yyyy/MM/dd"));
            
         }
 
