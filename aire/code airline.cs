@@ -9,6 +9,10 @@ using Microsoft.VisualBasic;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.IO;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DataTable = System.Data.DataTable;
+using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace aire
 {
@@ -84,7 +88,6 @@ namespace aire
         {
             d.connecter();
             button6.Hide();
-            button7.Hide();
             Remplissage_DtGdV();
             Remplissage_DtGdV1();
             Remplissage_DtGdV2();
@@ -224,6 +227,98 @@ namespace aire
             {
                 pictureBox1.Image = new Bitmap(opnfd.FileName);
                 pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+        }
+
+        private void dataGridView3_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            int index = e.RowIndex;
+            textBox1.Text = dataGridView3.Rows[index].Cells[0].Value.ToString();
+            textBox2.Text = dataGridView3.Rows[index].Cells[1].Value.ToString();
+
+            DataGridViewCell cell = dataGridView3.Rows[index].Cells[2];
+
+            // Check if the cell value is not null
+            if (cell.Value != null && cell.Value is byte[])
+            {
+                // Convert byte array to Image
+                byte[] byteArray = (byte[])cell.Value;
+                Image image = ByteArrayToImage(byteArray);
+
+                // Display the image in PictureBox
+                pictureBox1.Image = image;
+                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else {
+                pictureBox1.Image = null;
+            }
+        }
+        // Method to convert byte array to Image
+        private Image ByteArrayToImage(byte[] byteArray)
+        {
+            using (MemoryStream stream = new MemoryStream(byteArray))
+            {
+                return Image.FromStream(stream);
+            }
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text == "" || textBox2.Text == "")
+            {
+                MessageBox.Show("Please select the record from table below");
+            }
+            else
+            {
+                d.cmdd.Parameters.Clear();
+                d.cmdd.CommandType = CommandType.StoredProcedure;
+                d.cmdd.CommandText = "update_airlinxx";
+                d.cmdd.Parameters.Add("@name", SqlDbType.VarChar, 20).Value = textBox1.Text;
+                d.cmdd.Parameters.Add("@codeiata", SqlDbType.VarChar, 20).Value = textBox2.Text;
+                d.cmdd.Parameters.AddWithValue("image", savePhoto(pictureBox1));
+
+                d.cmdd.Connection = d.cn;
+
+                d.cmdd.ExecuteNonQuery();
+
+                MessageBox.Show("Record Updated Succesfully");
+
+                pictureBox1.Image = null;
+
+                textBox1.Text = "";
+                textBox2.Text = "";
+
+                Remplissage_DtGdV2();
+
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text == "" || textBox2.Text == "")
+            {
+                MessageBox.Show("Please select the record from table below");
+            }
+            else
+            {
+                d.cmdd.Parameters.Clear();
+                d.cmdd.CommandType = CommandType.StoredProcedure;
+                d.cmdd.CommandText = "delete_airlinxx";
+                d.cmdd.Parameters.Add("@name", SqlDbType.VarChar, 20).Value = textBox1.Text;
+                d.cmdd.Parameters.Add("@codeiata", SqlDbType.VarChar, 20).Value = textBox2.Text;
+
+                d.cmdd.Connection = d.cn;
+
+                d.cmdd.ExecuteNonQuery();
+
+                MessageBox.Show("Record Deleted Succesfully");
+
+                pictureBox1.Image = null;
+
+                textBox1.Text = "";
+                textBox2.Text = "";
+
+                Remplissage_DtGdV2();
+
             }
         }
     }

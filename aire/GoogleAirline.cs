@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using Microsoft.VisualBasic;
 using System.Diagnostics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace aire
 {
@@ -27,12 +28,7 @@ namespace aire
             GFAirline.Show();
         }
 
-
-
-
-
-        public int cnt = 0;
-        public void searchfordata(string frm, string to, bool isTargetOnly, string nameProc)
+        public void searchformultigroupcitydata(string frm, string to, bool isTargetOnly, string nameProc)
         {
             d.dt.Rows.Clear();
 
@@ -43,49 +39,217 @@ namespace aire
 
             d.cmdd.CommandText = "" + nameProc + "";
 
-            if (frm != "" && textBox2.Text == "")
+            //Get selected value of stops ddl
+            string selectedStops = ddlStops.SelectedValue.ToString();
+            selectedStops = selectedStops.Trim() == "Please Select" ? "" : selectedStops ;
+            //Get selected value of stops ddl
+            string selectedDays = ddlDays.SelectedValue.ToString();
+            selectedDays = selectedDays.Trim() == "Please Select" ? "" : selectedDays;
+            //Get selected value of cabin ddl
+            string selectedCabin = ddlCabin.SelectedValue.ToString();
+            selectedCabin = selectedCabin.Trim() == "Please Select" ? "" : selectedCabin;
+
+            if (!string.IsNullOrEmpty(selectedDays))
             {
-                d.cmdd.Parameters.Add("@from", SqlDbType.VarChar, 20).Value = frm;
+                // Remove non-numeric characters and keep only the first numeric value
+                string numericValue = new string(selectedDays.Where(char.IsDigit).ToArray());
+
+                // Update selectedDays with the numeric value
+                selectedDays = string.IsNullOrEmpty(numericValue) ? selectedDays : numericValue;
+            }
+
+            // Access the selected value when a button or some other control is clicked
+            //ComboBoxItem selectedDayValue = (ComboBoxItem)ddlDays.SelectedItem;
+            //var selectedDays = (string)selectedDayValue.Value;
+
+            string dateFromVar = "1997-01-01";
+            string dateToVar = "1997-01-01";
+            if (radioBtnDate.Checked )
+            {
+                dateFromVar = dateFrom.Value.ToString();
+                dateToVar = dateTo.Value.ToString();
+            }
+
+            if (radioBetween.Checked)
+            {
+                if (string.IsNullOrEmpty(txtMinPrice.Text) || string.IsNullOrEmpty(txtMaxPrice.Text))
+                {
+                    radioBetween.Checked = false;
+                }
+                else
+                {
+                    radioBetween.Checked = true;
+                }
+            }
+            if (radioGreater.Checked)
+            {
+                txtMaxPrice.Text = "";
+                if (string.IsNullOrEmpty(txtMinPrice.Text))
+                {
+                    radioGreater.Checked = false;
+                }
+                else
+                {
+                    radioGreater.Checked = true;
+                }
+            }
+            if (radioLess.Checked)
+            {
+                txtMaxPrice.Text = "";
+                if (string.IsNullOrEmpty(txtMinPrice.Text))
+                {
+                    radioLess.Checked = false;
+                }
+                else
+                {
+                    radioLess.Checked = true;
+                }
+            }
+
+            bool greenDiff = checkGreenDiff.Checked;
+            bool redDiff = checkRedDiff.Checked;
+
+            var varRadioBetween = radioBetween.Checked;
+            var varRadioGreater = radioGreater.Checked;
+            var varRadioLess = radioLess.Checked;
+            float varMinPrice = txtMinPrice.Text == "" || txtMinPrice.Text == null ? 0 : float.Parse(txtMinPrice.Text);
+            float varMaxPrice = txtMaxPrice.Text == "" || txtMaxPrice.Text == null ? 0 : float.Parse(txtMaxPrice.Text);
+
+            bool shortStays = chkShortStays.Checked;
+
+            bool everywhereFrom = false;
+            bool everywhereTo = false;
+
+            bool isFromFirstEverywhere = frm.Split(',').Select(e => e.Trim()).FirstOrDefault().Equals("Everywhere", StringComparison.OrdinalIgnoreCase);
+            if (isFromFirstEverywhere)
+            {
+                everywhereFrom = frm.ToLower() == "everywhere" ? false : true;
+                frm = string.Join(", ", frm.Split(',').Select(e => e.Trim()).Where(e => !e.Equals("Everywhere", StringComparison.OrdinalIgnoreCase)));
+            }
+            bool isToFirstEverywhere = to.Split(',').Select(e => e.Trim()).FirstOrDefault().Equals("Everywhere", StringComparison.OrdinalIgnoreCase);
+            if (isToFirstEverywhere)
+            {
+                everywhereTo = to.ToLower() == "everywhere" ? false : true;
+                to = string.Join(", ", to.Split(',').Select(e => e.Trim()).Where(e => !e.Equals("Everywhere", StringComparison.OrdinalIgnoreCase)));
+            }
+
+            if (frm != "" && to == "")
+            {
+                d.cmdd.Parameters.Add("@from", SqlDbType.VarChar, 200).Value = frm;
                 d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+                d.cmdd.Parameters.Add("@Airline", SqlDbType.VarChar, 200).Value = txtAirline.Text;
+                d.cmdd.Parameters.Add("@Aircode", SqlDbType.VarChar, 50).Value = txtAircode.Text;
+                d.cmdd.Parameters.Add("@Days", SqlDbType.VarChar, 10).Value = selectedDays;
+                d.cmdd.Parameters.Add("@Cabin", SqlDbType.VarChar, 100).Value = selectedCabin;
+                d.cmdd.Parameters.Add("@Shortstays", SqlDbType.Bit).Value = shortStays;
+                d.cmdd.Parameters.Add("@Fromdate", SqlDbType.Date).Value = dateFromVar;
+                d.cmdd.Parameters.Add("@Todate", SqlDbType.Date).Value = dateToVar;
+                d.cmdd.Parameters.Add("@IsBetween", SqlDbType.Bit).Value = varRadioBetween;
+                d.cmdd.Parameters.Add("@IsGreater", SqlDbType.Bit).Value = varRadioGreater;
+                d.cmdd.Parameters.Add("@IsLess", SqlDbType.Bit).Value = varRadioLess;
+                d.cmdd.Parameters.Add("@MinPrice", SqlDbType.Float).Value = varMinPrice;
+                d.cmdd.Parameters.Add("@MaxPrice", SqlDbType.Float).Value = varMaxPrice;
+                d.cmdd.Parameters.Add("@Stops", SqlDbType.VarChar, 10).Value = selectedStops;
+                d.cmdd.Parameters.Add("@EverywhereFrom", SqlDbType.Bit).Value = everywhereFrom;
+                d.cmdd.Parameters.Add("@GreenDiff", SqlDbType.Bit).Value = greenDiff;
+                d.cmdd.Parameters.Add("@RedDiff", SqlDbType.Bit).Value = redDiff;
             }
 
 
             else if (frm == "" && to != "")
             {
-                d.cmdd.Parameters.Add("@to", SqlDbType.VarChar, 20).Value = to;
+                d.cmdd.Parameters.Add("@to", SqlDbType.VarChar, 200).Value = to;
                 d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+                d.cmdd.Parameters.Add("@Airline", SqlDbType.VarChar, 200).Value = txtAirline.Text;
+                d.cmdd.Parameters.Add("@Aircode", SqlDbType.VarChar, 50).Value = txtAircode.Text;
+                d.cmdd.Parameters.Add("@Days", SqlDbType.VarChar, 10).Value = selectedDays;
+                d.cmdd.Parameters.Add("@Cabin", SqlDbType.VarChar, 100).Value = selectedCabin;
+                d.cmdd.Parameters.Add("@Shortstays", SqlDbType.Bit).Value = shortStays;
+                d.cmdd.Parameters.Add("@Fromdate", SqlDbType.Date).Value = dateFromVar;
+                d.cmdd.Parameters.Add("@Todate", SqlDbType.Date).Value = dateToVar;
+                d.cmdd.Parameters.Add("@IsBetween", SqlDbType.Bit).Value = varRadioBetween;
+                d.cmdd.Parameters.Add("@IsGreater", SqlDbType.Bit).Value = varRadioGreater;
+                d.cmdd.Parameters.Add("@IsLess", SqlDbType.Bit).Value = varRadioLess;
+                d.cmdd.Parameters.Add("@MinPrice", SqlDbType.Float).Value = varMinPrice;
+                d.cmdd.Parameters.Add("@MaxPrice", SqlDbType.Float).Value = varMaxPrice;
+                d.cmdd.Parameters.Add("@Stops", SqlDbType.VarChar, 10).Value = selectedStops;
+                d.cmdd.Parameters.Add("@EverywhereTo", SqlDbType.Bit).Value = everywhereTo;
+                d.cmdd.Parameters.Add("@GreenDiff", SqlDbType.Bit).Value = greenDiff;
+                d.cmdd.Parameters.Add("@RedDiff", SqlDbType.Bit).Value = redDiff;
             }
             else if (frm != "" && to != "")
             {
-                d.cmdd.Parameters.Add("@from", SqlDbType.VarChar, 20).Value = frm;
-                d.cmdd.Parameters.Add("@to", SqlDbType.VarChar, 20).Value = to;
-                d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+                d.cmdd.Parameters.Add("@From", SqlDbType.VarChar, 200).Value = frm;
+                d.cmdd.Parameters.Add("@To", SqlDbType.VarChar, 200).Value = to;
+                d.cmdd.Parameters.Add("@IsTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+                d.cmdd.Parameters.Add("@Airline", SqlDbType.VarChar, 200).Value = txtAirline.Text;
+                d.cmdd.Parameters.Add("@Aircode", SqlDbType.VarChar, 50).Value = txtAircode.Text;
+                d.cmdd.Parameters.Add("@Days", SqlDbType.VarChar, 10).Value = selectedDays;
+                d.cmdd.Parameters.Add("@Cabin", SqlDbType.VarChar, 100).Value = selectedCabin;
+                d.cmdd.Parameters.Add("@Shortstays", SqlDbType.Bit).Value = shortStays;
+                d.cmdd.Parameters.Add("@Fromdate", SqlDbType.Date).Value = dateFromVar;
+                d.cmdd.Parameters.Add("@Todate", SqlDbType.Date).Value = dateToVar;
+                d.cmdd.Parameters.Add("@IsBetween", SqlDbType.Bit).Value = varRadioBetween;
+                d.cmdd.Parameters.Add("@IsGreater", SqlDbType.Bit).Value = varRadioGreater;
+                d.cmdd.Parameters.Add("@IsLess", SqlDbType.Bit).Value = varRadioLess;
+                d.cmdd.Parameters.Add("@MinPrice", SqlDbType.Float).Value = varMinPrice;
+                d.cmdd.Parameters.Add("@MaxPrice", SqlDbType.Float).Value = varMaxPrice;
+                d.cmdd.Parameters.Add("@Stops", SqlDbType.VarChar, 10).Value = selectedStops;
+                d.cmdd.Parameters.Add("@EverywhereFrom", SqlDbType.Bit).Value = everywhereFrom;
+                d.cmdd.Parameters.Add("@EverywhereTo", SqlDbType.Bit).Value = everywhereTo;
+                d.cmdd.Parameters.Add("@GreenDiff", SqlDbType.Bit).Value = greenDiff;
+                d.cmdd.Parameters.Add("@RedDiff", SqlDbType.Bit).Value = redDiff;
             }
+            else if (frm == "" && to == "")
+            {
+                //d.cmdd.Parameters.Clear();
+                d.cmdd.Parameters.Add("@IsTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+                d.cmdd.Parameters.Add("@Airline", SqlDbType.VarChar, 200).Value = txtAirline.Text;
+                d.cmdd.Parameters.Add("@Aircode", SqlDbType.VarChar, 50).Value = txtAircode.Text;
+                d.cmdd.Parameters.Add("@Days", SqlDbType.VarChar, 10).Value = selectedDays;
+                d.cmdd.Parameters.Add("@Cabin", SqlDbType.VarChar, 100).Value = selectedCabin;
+                d.cmdd.Parameters.Add("@Shortstays", SqlDbType.Bit).Value = shortStays;
+                d.cmdd.Parameters.Add("@Fromdate", SqlDbType.Date).Value = dateFromVar;
+                d.cmdd.Parameters.Add("@Todate", SqlDbType.Date).Value = dateToVar;
+                d.cmdd.Parameters.Add("@IsBetween", SqlDbType.Bit).Value = varRadioBetween;
+                d.cmdd.Parameters.Add("@IsGreater", SqlDbType.Bit).Value = varRadioGreater;
+                d.cmdd.Parameters.Add("@IsLess", SqlDbType.Bit).Value = varRadioLess;
+                d.cmdd.Parameters.Add("@MinPrice", SqlDbType.Float).Value = varMinPrice;
+                d.cmdd.Parameters.Add("@MaxPrice", SqlDbType.Float).Value = varMaxPrice;
+                d.cmdd.Parameters.Add("@Stops", SqlDbType.VarChar, 10).Value = selectedStops;
+                d.cmdd.Parameters.Add("@GreenDiff", SqlDbType.Bit).Value = greenDiff;
+                d.cmdd.Parameters.Add("@RedDiff", SqlDbType.Bit).Value = redDiff;
+            }
+
+            d.cmdd.CommandTimeout = 0;
             d.cmdd.Connection = d.cn;
 
-        
-                d.dt.Load(d.cmdd.ExecuteReader());
+            d.dt.Load(d.cmdd.ExecuteReader());
 
-                cnt = d.dt.Rows.Count;
-                if (cnt == 0)
+            cnt = d.dt.Rows.Count;
+            if (cnt == 0)
+            {
+                MessageBox.Show("The information entered is not on the database!");
+            }
+            for (int i = 0; i < cnt; i++)
+            {
+                bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
+
+                int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
+                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+
+                if (IsTargetFound.HasValue && IsTargetFound.Value)
                 {
-                    MessageBox.Show("The information entered is not on the database!");
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
                 }
-                for (int i = 0; i < cnt; i++)
-                {
-                    bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
+            }
 
-                    int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                    double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
 
-                    if (IsTargetFound.HasValue && IsTargetFound.Value)
-                    {
-                        dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                    }
-                }
-           
-            
         }
+
+
+
+        public int cnt = 0;
 
 
         DataSet dshtl = new DataSet();
@@ -134,14 +298,7 @@ namespace aire
             catch { }
         }
 
-        string cbnB1, cbnB2, cbnB3;
-
-        private void radioButton3_CheckedChanged(object sender, EventArgs e)
-        {
-            maxprice.Visible = true;
-            label4.Visible = true;
-            dataGridView1.Rows.Clear();
-        }
+        string cbnB1, cbnB2, cbnB3, cbnB4;
 
         string price1, price2, price3, price4, price5, price6;
 
@@ -191,66 +348,41 @@ namespace aire
 
         string pricecabin1, pricecabin2, pricecabin3, pricecabin4;
         double minP, maxP;
-        private void myfunction()
-        {
-            if (min.Text != "" && max.Text != "")
-            {
-                minP = double.Parse(min.Text);
-                maxP = double.Parse(max.Text);
-            }
-            else if (min.Text != "" && max.Text == "")
-            {
-                minP = double.Parse(min.Text);
-                maxP = double.Parse(min.Text);
-            }
-            else
-            {
-                minP = double.Parse(max.Text);
-                maxP = double.Parse(max.Text);
-            }
 
-        }
-        private void button3_Click(object sender, EventArgs e)
+        private void txtMinPrice_TextChanged(object sender, EventArgs e)
         {
-            label6.Text = "";
-            dataGridView1.Visible = true;
-
-            dataGridView2.Visible = false;
-      
-                dataGridView1.Rows.Clear();
-            if(min.Text=="" && max.Text=="")
+            if (!radioBetween.Checked && !radioGreater.Checked && !radioLess.Checked)
             {
-                dates("serchGGl1Airline", targetsOnlyChkbox.Checked);
+                // None of the radio buttons is checked, show an error message
+                MessageBox.Show("Please select a radio button before entering input.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else
-            {
-                myfunction();
-                datePrice("searchDatePricecomprGOOGLAirline", targetsOnlyChkbox.Checked);
-            }
-            min.Text = "";
-            max.Text = "";
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void checkGreenDiff_CheckedChanged(object sender, EventArgs e)
         {
-            if (date1.Value < date2.Value)
+            if (checkGreenDiff.Checked)
             {
-                if (textBox1.Text != "" && textBox2.Text != "") { FromToDates("serchFromToDatesGOOGleAirline", textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date2.Value.ToString("yyyy/MM/dd")); }
-                else if (textBox1.Text == "" && textBox2.Text != "") { FromToDates("serchFromToDatesGOOGleAirline", "", textBox2.Text, targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date2.Value.ToString("yyyy/MM/dd")); }
-                else if (textBox1.Text != "" && textBox2.Text == "") { FromToDates("serchFromToDatesGOOGleAirline", textBox1.Text, "", targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date2.Value.ToString("yyyy/MM/dd")); }
+                checkRedDiff.Checked = false;
             }
-            else if(date1.Value == date2.Value)
+        }
+
+        private void checkRedDiff_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkRedDiff.Checked)
             {
-                if (textBox1.Text != "" && textBox2.Text != "") { FromToDates("serchFromToDatesGOOGleAirline", textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date1.Value.ToString("yyyy/MM/dd")); }
-                else if (textBox1.Text == "" && textBox2.Text != "") { FromToDates("serchFromToDatesGOOGleAirline", "", textBox2.Text, targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date1.Value.ToString("yyyy/MM/dd")); }
-                else if (textBox1.Text != "" && textBox2.Text == "") { FromToDates("serchFromToDatesGOOGleAirline", textBox1.Text, "", targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date1.Value.ToString("yyyy/MM/dd")); }
+                checkGreenDiff.Checked = false;
             }
-            else if (date1.Value != DateTime.Now && date2.Value==DateTime.Now)
-            {
-                if (textBox1.Text != "" && textBox2.Text != "") { FromToDates("serchFromToDatesGOOGleAirline", textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date1.Value.ToString("yyyy/MM/dd")); }
-                else if (textBox1.Text == "" && textBox2.Text != "") { FromToDates("serchFromToDatesGOOGleAirline", "", textBox2.Text, targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date1.Value.ToString("yyyy/MM/dd")); }
-                else if (textBox1.Text != "" && textBox2.Text == "") { FromToDates("serchFromToDatesGOOGleAirline", textBox1.Text, "", targetsOnlyChkbox.Checked, date1.Value.ToString("yyyy/MM/dd"), date1.Value.ToString("yyyy/MM/dd")); }
-            }
+        }
+
+        private void radioBtnDate_CheckedChanged(object sender, EventArgs e)
+        {
+            chkShortStays.Enabled = true;
+        }
+
+        private void radioBtnNoDate_CheckedChanged(object sender, EventArgs e)
+        {
+            chkShortStays.Checked = false;
+            chkShortStays.Enabled = false;
         }
 
         private void FromToDates(string adrss, string from, string to, bool isTargetOnly, string fromdate, string todate)
@@ -293,249 +425,8 @@ namespace aire
             datagridvColor();
         }
 
-        private void radioButton4_CheckedChanged(object sender, EventArgs e)
-        {
-            DataRow[] ligne;
-            dataGridView1.Rows.Clear();
-            ligne = d.dt.Select("Olde_price = 0 and New_price > 0", "New_price desc");
-            for (int i = 0; i < cnt; i++)
-            {
-
-                dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
-            }
-
-            datagridvColor();
-            ligne = null;
-            radioButton4.Checked = false;
-        }
-
-        private void radioButton5_CheckedChanged(object sender, EventArgs e)
-        {
-            dataGridView1.Rows.Clear();
-            int cntDt = d.dt.Rows.Count;
-            for (int i = 0; i < cntDt; i++)
-            {
-
-                dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
-            }
-
-            datagridvColor();
-            radioButton5.Checked = false;
-        }
-
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
-
-        }
-
-        private void button8_Click(object sender, EventArgs e)
-        {
-            if(radioDate.Checked)
-            {
-                if(FromBox.Text!=""&& ToBox.Text!=""&& AirCodeBox.Text!="" && airlineBox.Text!="")
-                   search4(1, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-              else if ((FromBox.Text != "" && ToBox.Text != "") && (AirCodeBox.Text != "" && airlineBox.Text == ""))
-                   search4(2, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text != "" && ToBox.Text != "") && (AirCodeBox.Text == "" && airlineBox.Text != ""))
-                    search4(2, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-
-                else if ((FromBox.Text != "" && ToBox.Text == "") && (AirCodeBox.Text != "" && airlineBox.Text == ""))
-                    search4(3, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text == "" && ToBox.Text != "") && (AirCodeBox.Text == "" && airlineBox.Text != ""))
-                    search4(3, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text != "" && ToBox.Text == "") && (AirCodeBox.Text == "" && airlineBox.Text != ""))
-                    search4(3, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text == "" && ToBox.Text != "") && (AirCodeBox.Text != "" && airlineBox.Text == ""))
-                    search4(3, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-
-                else if ((FromBox.Text != "" && ToBox.Text == "") && (AirCodeBox.Text != "" && airlineBox.Text != ""))
-                    search4(4, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text == "" && ToBox.Text != "") && (AirCodeBox.Text != "" && airlineBox.Text != ""))
-                    search4(4, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-
-                else if (AirCodeBox.Text != "" && airlineBox.Text != "")
-                    search4(9,"","", targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if (AirCodeBox.Text == "" && airlineBox.Text != "")
-                    search4(10, "","", targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-                else if (AirCodeBox.Text != "" && airlineBox.Text == "")
-                    search4(10, "", "", targetsOnlyChkbox.Checked, FromDate.Value.ToString("yyyy/MM/dd"), ToDate.Value.ToString("yyyy/MM/dd"), AirCodeBox.Text, airlineBox.Text);
-
-
-            }
-            else if(radioNoDate.Checked)
-            {
-                if (FromBox.Text != "" && ToBox.Text != "" && AirCodeBox.Text != "" && airlineBox.Text != "")
-                    search4(5, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-               else if ((FromBox.Text != "" && ToBox.Text == "") && (AirCodeBox.Text != "" && airlineBox.Text == ""))
-                    search4(7, FromBox.Text, "", targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text == "" && ToBox.Text != "") && (AirCodeBox.Text == "" && airlineBox.Text != ""))
-                    search4(7, "", ToBox.Text, targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text != "" && ToBox.Text == "") && (AirCodeBox.Text == "" && airlineBox.Text != ""))
-                    search4(7, FromBox.Text, "", targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text == "" && ToBox.Text != "") && (AirCodeBox.Text != "" && airlineBox.Text == ""))
-                    search4(7, "", ToBox.Text, targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-
-                else if ((FromBox.Text != "" && ToBox.Text != "") && (AirCodeBox.Text == "" && airlineBox.Text != ""))
-                    search4(6, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-                else if ((FromBox.Text != "" && ToBox.Text != "") && (AirCodeBox.Text != "" && airlineBox.Text == ""))
-                    search4(6, FromBox.Text, ToBox.Text, targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-
-                else if (FromBox.Text != "" && ToBox.Text == "" && (AirCodeBox.Text != "" && airlineBox.Text != ""))
-                    search4(8, FromBox.Text, "", targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-                else if (FromBox.Text == "" && ToBox.Text != "" && (AirCodeBox.Text != "" && airlineBox.Text != ""))
-                    search4(8,"", ToBox.Text, targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-
-                else if (AirCodeBox.Text != "" || airlineBox.Text != "")
-                    search4(11, "", "", targetsOnlyChkbox.Checked, "1997-01-01", "1997-01-01", AirCodeBox.Text, airlineBox.Text);
-
-            }
-            FromBox.Text = "";
-            ToBox.Text = "";
-            AirCodeBox.Text = "";
-            airlineBox.Text = "";
-            FromDate.Value = DateTime.Now;
-            ToDate.Value = DateTime.Now;
-        }
-        private void search4(int nbrV,string frm,string to, bool isTargetOnly, string frmdate, string Tdate,string aircode, string airline)
-        {
-            dataGridView1.Rows.Clear();
-
-            d.dt.Rows.Clear();
-            d.cmdd.Parameters.Clear();
-            d.cmdd.CommandType = CommandType.StoredProcedure;
-            d.cmdd.CommandText = "searchFormToAirlineDateGoogleAirlin";
-            d.cmdd.Parameters.Add("@nbr", SqlDbType.Int).Value = nbrV;
-            d.cmdd.Parameters.Add("@From", SqlDbType.VarChar, 20).Value = frm;
-            d.cmdd.Parameters.Add("@To", SqlDbType.VarChar, 20).Value = to;
-            d.cmdd.Parameters.Add("@date1", SqlDbType.Date).Value = frmdate;
-            d.cmdd.Parameters.Add("@date2", SqlDbType.Date).Value = Tdate;
-            d.cmdd.Parameters.Add("@aircode", SqlDbType.VarChar,20).Value = aircode;
-            d.cmdd.Parameters.Add("@airline", SqlDbType.VarChar,40).Value = airline;
-            d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
-
-            d.cmdd.Connection = d.cn;
-
-            d.dt.Load(d.cmdd.ExecuteReader());
-
-            cnt = d.dt.Rows.Count;
-            if (cnt == 0)
-            {
-                MessageBox.Show("The information entered is not on the database!");
-            }
-
-
-
-            for (int i = 0; i < cnt; i++)
-            {
-                bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
-
-                int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
-
-                if (IsTargetFound.HasValue && IsTargetFound.Value)
-                {
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                }
-            }
-
-            datagridvColor();
-        }
-
-        public void dates(string str, bool isTargetOnly)
-        {
-            d.dt.Rows.Clear();
-            d.cmdd.Parameters.Clear();
-            d.cmdd.CommandType = CommandType.StoredProcedure;
-            d.cmdd.CommandText = str;
-            d.cmdd.Parameters.Add("@date1", SqlDbType.Date).Value = date1.Value.ToString("yyyy/MM/dd");
-            d.cmdd.Parameters.Add("@date2", SqlDbType.Date).Value = date2.Value.ToString("yyyy/MM/dd");
-            d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
-
-            d.cmdd.Connection = d.cn;
-
-            d.dt.Load(d.cmdd.ExecuteReader());
-
-            cnt = d.dt.Rows.Count;
-            if (cnt == 0)
-            {
-                MessageBox.Show("The information entered is not on the database!");
-            }
-
-
-
-            for (int i = 0; i < cnt; i++)
-            {
-                bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
-
-                int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
-
-                if (IsTargetFound.HasValue && IsTargetFound.Value)
-                {
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                }
-            }
-            datagridvColor();
-
-        }
-        public void datePrice(string str, bool isTargetOnly)
-        {
-            d.dt.Rows.Clear();
-            d.cmdd.Parameters.Clear();
-            d.cmdd.CommandType = CommandType.StoredProcedure;
-            d.cmdd.CommandText = str;
-            d.cmdd.Parameters.Add("@dateA", SqlDbType.Date).Value = date1.Value.ToString("yyyy/MM/dd");
-            d.cmdd.Parameters.Add("@dateB", SqlDbType.Date).Value = date2.Value.ToString("yyyy/MM/dd");
-            d.cmdd.Parameters.Add("@min", SqlDbType.Float).Value = minP;
-            d.cmdd.Parameters.Add("@max", SqlDbType.Float).Value = maxP;
-            d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
-            d.cmdd.Connection = d.cn;
-
-            d.dt.Load(d.cmdd.ExecuteReader());
-
-            cnt = d.dt.Rows.Count;
-            if (cnt == 0)
-            {
-                MessageBox.Show("The information entered is not on the database!");
-            }
-
-
-
-            for (int i = 0; i < cnt; i++)
-            {
-                bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
-
-                int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
-
-                if (IsTargetFound.HasValue && IsTargetFound.Value)
-                {
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                }
-            }
-            datagridvColor();
 
         }
 
@@ -580,119 +471,74 @@ namespace aire
             datagridvColor();
         }
 
-        private void comboBox2_SelectionChangeCommitted(object sender, EventArgs e)
+        private void button13_Click(object sender, EventArgs e)
         {
-            DataRow[] ligne;
+            label6.Text = "";
+            dataGridView1.Visible = true;
+
+            dataGridView2.Visible = false;
             dataGridView1.Rows.Clear();
-            ligne = d.dt.Select("Stops = '" + comboBox2.SelectedValue.ToString() + "'", "New_price desc");
-            foreach (DataRow dr in ligne)
+
+            cbnB1 = "serchFromToMultiGroupCityGOOGleAirlineEverywhere";
+            cbnB2 = "serchFromMultiGroupCityGOOGleAirlineEverywhere";
+            cbnB3 = "serchToMultiGroupCityGOOGleAirlineEverywhere";
+            cbnB4 = "serchWithoutFromToGOOGleAirline";
+            string frm = textBox5.Text;
+            string to = textBox6.Text;
+            if (frm.ToLower() == "everywhere")
             {
-                dataGridView1.Rows.Add(dr[0].ToString(), dr[1].ToString(), dr[2].ToString(), DateTime.Parse(dr[3].ToString()),
-                double.Parse(dr[4].ToString()), double.Parse(dr[5].ToString()), double.Parse(dr[6].ToString()), double.Parse(dr[7].ToString()), dr[8].ToString(), dr[9].ToString(), dr[10].ToString(), dr[11].ToString(), dr[12].ToString(), DateTime.Parse(dr[15].ToString()), dr[13].ToString());
+                frm = string.Empty;
             }
-            datagridvColor();
-            ligne = null;
+            if (to.ToLower() == "everywhere")
+            {
+                to = string.Empty;
+            }
+            if (frm != "" && to != "")
+            {
+
+                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB1);
+
+                datagridvColor();
+            }
+            else if (frm != "" && to == "")
+            {
+
+                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB2);
+
+                datagridvColor();
+            }
+            else if (frm == "" && to != "")
+            {
+
+                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB3);
+
+                datagridvColor();
+            }
+            else if(frm == "" && to == "")
+            {
+                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB4);
+
+                datagridvColor();
+            }
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void radioGreater_CheckedChanged(object sender, EventArgs e)
         {
-            
-                    pricecabin1 = "serchFromTopriceGOOGlebigAirline";
-                    pricecabin2 = "serchFromTopriceGOOGleAirline";
-                    pricecabin3 = "serchFromTopriceGOOGlebetweenAirline";
-                    
-
-
-            if (textBox1.Text != "" || textBox2.Text != "")
-                {
-                   
-                        if (radioButton1.Checked == true && minPrice.Text != "")
-                        {
-
-                            pricewithfrom_to(textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, float.Parse(minPrice.Text), 99999, pricecabin1);
-  
-                        }
-                        else if (radioButton2.Checked == true && minPrice.Text != "")
-                        {
-
-                            pricewithfrom_to(textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, float.Parse(minPrice.Text), 99999, pricecabin2);
-  
-                        }
-                        else if (radioButton3.Checked == true && minPrice.Text != "" && maxprice.Text != "")
-                        {
-
-                            pricewithfrom_to(textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, float.Parse(minPrice.Text), float.Parse(maxprice.Text), pricecabin3);
-
-                        }
-                  
-                }
-
-           
-
-           
-            
+            txtMaxPrice.Visible = false;
+            labelMaxPrice.Visible = false;
         }
 
-
-        public void pricewithfrom_to(string frm, string to, bool isTargetOnly, float price1, float price2, string nameproce)
+        private void radioLess_CheckedChanged(object sender, EventArgs e)
         {
-            dataGridView1.Rows.Clear();
-            if (d.dt.Rows.Count != 0)
-            {
-                d.dt.Rows.Clear();
-            }
-            d.cmdd.Parameters.Clear();
-
-            d.cmdd.CommandType = CommandType.StoredProcedure;
-            d.cmdd.CommandText = nameproce;
-            if ((frm != "" || to != "") && price1 != 99999 && price2 != 99999)
-            {
-                d.cmdd.Parameters.Add("@From", SqlDbType.VarChar, 50).Value = frm;
-                d.cmdd.Parameters.Add("@To", SqlDbType.VarChar, 50).Value = to;
-                d.cmdd.Parameters.Add("@price1", SqlDbType.Float).Value = float.Parse(minPrice.Text);
-                d.cmdd.Parameters.Add("@price2", SqlDbType.Float).Value = float.Parse(maxprice.Text);
-                d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
-            }
-            else if ((frm != "" || to != "") && price1 != 99999 && price2 == 99999)
-            {
-                d.cmdd.Parameters.Add("@From", SqlDbType.VarChar, 50).Value = frm;
-                d.cmdd.Parameters.Add("@To", SqlDbType.VarChar, 50).Value = to;
-                d.cmdd.Parameters.Add("@price1", SqlDbType.Float).Value = float.Parse(minPrice.Text);
-                d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
-            }
-
-
-            d.cmdd.Connection = d.cn;
-
-            d.dt.Load(d.cmdd.ExecuteReader());
-
-            cnt = d.dt.Rows.Count;
-
-          if (cnt == 0)
-                {
-                    MessageBox.Show("The information entered is not on the database!");
-                }
-            for (int i = 0; i < cnt; i++)
-            {
-                bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
-
-                int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
-
-                if (IsTargetFound.HasValue && IsTargetFound.Value)
-                {
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                }
-            }
-
-
-
-            datagridvColor();
+            txtMaxPrice.Visible = false;
+            labelMaxPrice.Visible = false;
         }
 
-
-        
-
+        private void radioBetween_CheckedChanged(object sender, EventArgs e)
+        {
+            txtMaxPrice.Visible = true;
+            labelMaxPrice.Visible = true;
+        }
         private void releaseObject(object obj)
         {
             try
@@ -709,43 +555,6 @@ namespace aire
             {
                 GC.Collect();
             }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            label6.Text = "";
-            dataGridView1.Visible = true;
-
-            dataGridView2.Visible = false;
-            dataGridView1.Rows.Clear();
-           
-                price1 = "priceGOOGL1Airline";
-                price2 = "googlebigAirline";
-                price3 = "googlelesAirline";
-
-           
-                if (radioButton3.Checked && minPrice.Text != "" && maxprice.Text != "")
-                {
-
-                    somme(float.Parse(minPrice.Text), float.Parse(maxprice.Text), targetsOnlyChkbox.Checked, price1);
-
-                   
-                }
-                else if (radioButton1.Checked && minPrice.Text != "")
-                {
-                   
-
-                    somme(float.Parse(minPrice.Text), 99999, targetsOnlyChkbox.Checked, price2);
-
-                   
-                }
-                else if (radioButton2.Checked && minPrice.Text != "")
-                {
-                    
-                    somme(float.Parse(minPrice.Text), 99999, targetsOnlyChkbox.Checked, price3);
-
-                }
-    
         }
 
 
@@ -800,74 +609,88 @@ namespace aire
             datagridvColor();
         }
 
-        private void radioButton2_CheckedChanged(object sender, EventArgs e)
-        {
-            maxprice.Visible = false;
-            label4.Visible = false;
-        }
-
-        private void radioButton1_CheckedChanged(object sender, EventArgs e)
-        {
-            maxprice.Visible = false;
-            label4.Visible = false;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            label6.Text = "";
-            dataGridView1.Visible = true;
-
-            dataGridView2.Visible = false;
-            dataGridView1.Rows.Clear();
-           
-                cbnB1 = "serchFromToGOOGleAirline";
-                cbnB2 = "serchFromGOOGleAirline";
-                cbnB3 = "serchToGOOGleAirline";
-          
-            if (textBox1.Text != "" && textBox2.Text != "")
-            {
-
-                searchfordata(textBox1.Text, textBox2.Text, targetsOnlyChkbox.Checked, cbnB1);
-
-                datagridvColor();
-            }
-            else if (textBox1.Text != "" && textBox2.Text == "")
-            {
-
-                searchfordata(textBox1.Text, "", targetsOnlyChkbox.Checked, cbnB2);
-                datagridvColor();
-            }
-            else if (textBox1.Text == "" && textBox2.Text != "")
-            {
-
-                searchfordata("", textBox2.Text, targetsOnlyChkbox.Checked, cbnB3);
-                datagridvColor();
-
-            }
-
-          
-        }
-
 
         private void comb()
         {
             d.ds.Clear();
 
+            // Fill the DataTable with distinct Stops from the database
             d.da = new SqlDataAdapter("select distinct Stops from comprGOOGLAirline", d.cn);
             d.da.Fill(d.ds, "comST");
 
-            comboBox2.DataSource = d.ds.Tables["comST"];
-            comboBox2.DisplayMember = "Stops";
-            comboBox2.ValueMember = "Stops";
+            // Create a new row for "Please Select"
+            DataRow pleaseSelectRow = d.ds.Tables["comST"].NewRow();
+            pleaseSelectRow["Stops"] = "Please Select";
 
+            // Insert the "Please Select" row at the 0 index
+            d.ds.Tables["comST"].Rows.InsertAt(pleaseSelectRow, 0);
+
+            // Set up the ComboBox
+            ddlStops.DataSource = d.ds.Tables["comST"];
+            ddlStops.DisplayMember = "Stops";
+            ddlStops.ValueMember = "Stops";
+
+
+            //DAYS
+            // Fill the DataTable with distinct Days from the database
+            d.da = new SqlDataAdapter("select distinct Days from comprGOOGLAirline", d.cn);
+            d.da.Fill(d.ds, "comDays");
+
+            // Create a new row for "Please Select"
+            DataRow pleaseSelectRowDays = d.ds.Tables["comDays"].NewRow();
+            pleaseSelectRowDays["Days"] = "Please Select";
+
+            // Insert the "Please Select" row at the 0 index
+            d.ds.Tables["comDays"].Rows.InsertAt(pleaseSelectRowDays, 0);
+
+            // Set up the ComboBox
+            ddlDays.DataSource = d.ds.Tables["comDays"];
+            ddlDays.DisplayMember = "Days";
+            ddlDays.ValueMember = "Days";
+
+
+            //CABIN
+            // Fill the DataTable with distinct Cabin from the database
+            d.da = new SqlDataAdapter("select distinct Cabin from comprGOOGLAirline", d.cn);
+            d.da.Fill(d.ds, "comCabin");
+
+            // Create a new row for "Please Select"
+            DataRow pleaseSelectRowCabin = d.ds.Tables["comCabin"].NewRow();
+            pleaseSelectRowCabin["Cabin"] = "Please Select";
+
+            // Insert the "Please Select" row at the 0 index
+            d.ds.Tables["comCabin"].Rows.InsertAt(pleaseSelectRowCabin, 0);
+
+            // Set up the ComboBox
+            ddlCabin.DataSource = d.ds.Tables["comCabin"];
+            ddlCabin.DisplayMember = "Cabin";
+            ddlCabin.ValueMember = "Cabin";
         }
+
 
         private void GoogleAirline_Load(object sender, EventArgs e)
         {
-           
+            // Add items to the ComboBox
+            //ddlDays.Items.Add(new ComboBoxItem("Please Select Days", ""));
+            //ddlDays.Items.Add(new ComboBoxItem("14 days", "14"));
+            //ddlDays.Items.Add(new ComboBoxItem("13 days", "13"));
+            //ddlDays.Items.Add(new ComboBoxItem("12 days", "12"));
+            //ddlDays.Items.Add(new ComboBoxItem("8 days", "8"));
+            //ddlDays.Items.Add(new ComboBoxItem("7 days", "7"));
+            //ddlDays.Items.Add(new ComboBoxItem("4 days", "4"));
+            //ddlDays.Items.Add(new ComboBoxItem("3 days", "3"));
+            //ddlDays.Items.Add(new ComboBoxItem("2 days", "2"));
+
+            //// Set the default selected index (optional)
+            //ddlDays.SelectedIndex = 0; // Set to the index of the desired default item
+
+            //set the no date radio as selected
+            radioBtnNoDate.Checked = true;
+
             d.connecter();
-            label5.Visible = false;
+            //load comobox ddl data
             comb();
+            //label5.Visible = false;
 
             dataGridView2.Visible = false;
             dataGridView1.Visible = true;
@@ -879,6 +702,21 @@ namespace aire
             d.da.Fill(dshtl, "code");
             dthtl = dshtl.Tables["code"];
         }
+        public class ComboBoxItem
+        {
+            public string Text { get; set; }
+            public object Value { get; set; }
 
+            public ComboBoxItem(string text, object value)
+            {
+                Text = text;
+                Value = value;
+            }
+
+            public override string ToString()
+            {
+                return Text;
+            }
+        }
     }
 }
