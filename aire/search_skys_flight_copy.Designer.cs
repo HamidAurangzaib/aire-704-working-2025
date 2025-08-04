@@ -86,6 +86,8 @@
             this.label23 = new System.Windows.Forms.Label();
             this.txtMaxPrice = new System.Windows.Forms.TextBox();
             this.txtMinPrice = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox7.SuspendLayout();
@@ -127,7 +129,7 @@
             this.button9.Location = new System.Drawing.Point(1253, 218);
             this.button9.Margin = new System.Windows.Forms.Padding(4);
             this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(132, 28);
+            this.button9.Size = new System.Drawing.Size(132, 35);
             this.button9.TabIndex = 54;
             this.button9.Text = "Upload GF";
             this.button9.UseVisualStyleBackColor = false;
@@ -696,12 +698,32 @@
             this.txtMinPrice.Tag = "";
             this.txtMinPrice.TextChanged += new System.EventHandler(this.txtMinPrice_TextChanged);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(1007, 230);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(189, 23);
+            this.button1.TabIndex = 90;
+            this.button1.Text = "SYNC DATA";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(804, 236);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(0, 16);
+            this.label1.TabIndex = 91;
+            // 
             // search_skys_flight_copy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1543, 871);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox7);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.label6);
@@ -785,5 +807,7 @@
         private System.Windows.Forms.CheckBox chkDiffPrice;
         private System.Windows.Forms.CheckBox chkNewPrice;
         private System.Windows.Forms.CheckBox chkShortStays;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Data.OleDb;
+using System.Data.SqlClient;
+using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.SqlClient;
+using Z.Dapper.Plus;
 
 namespace aire
 {
@@ -320,6 +322,298 @@ namespace aire
           
             Remplissage_DtGdV();
         }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            button6.Enabled = false;
+            SyncCODE3();
+            SyncCodecitys();
+            SyncAirlinex();
+            button6.Enabled = true;
+            MessageBox.Show("Done!", "");
+        }
+
+        private void SyncAirlinex()
+        {
+            int y = 0;
+
+      
+            int x = 0;
+            List<airlinexModel> Dataset = new List<airlinexModel>();
+            // Database connections
+            string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+            string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+            IDbConnection db2 = new SqlConnection(connNEWStr1);
+            using (SqlConnection connNew = new SqlConnection(connNEWStr1))
+            using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+            {
+                connNew.Open();
+                connOLD.Open();
+
+                string Query = $"TRUNCATE TABLE airlinex ";
+                SqlCommand cmd12 = new SqlCommand(Query, connNew);
+                var result = cmd12.ExecuteNonQuery();
+
+
+                Query = $"SELECT  count(*) FROM airlinex ";
+                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
+                var Count = cmd13.ExecuteScalar();
+
+
+                Query = $"SELECT  * FROM airlinex";
+
+
+
+                if (int.Parse(Count.ToString()) > 0)
+                {
+
+                    SqlCommand cOld = new SqlCommand(Query, connOLD);
+
+
+
+                    {
+
+                        using (SqlDataReader reader = cOld.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                airlinexModel line = new airlinexModel();
+                                // Assuming you want to display some columns from the table, e.g., id and some other column
+                                line.Airline = reader["Airline"].ToString();
+                                line.CodeAirline = reader["CodeAirline"].ToString();
+                                if (reader["Photo"] != null)
+                                {
+                                    line.Photo = (byte[])reader["Photo"];
+                                }
+
+
+                                Dataset.Add(line);
+
+
+
+
+
+                                x++;
+                                //        label1.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
+                                if (x % 5000 == 0)
+                                {
+                                    db2.BulkInsert(Dataset);
+                                    Application.DoEvents();
+                                    Dataset.Clear();
+
+
+                                }
+
+
+
+                            }
+
+
+
+                            if (Dataset.Count > 0)
+                            {
+                                db2.BulkInsert(Dataset);
+                                Application.DoEvents();
+                                Dataset.Clear();
+                                //  label1.Text = "Done!";
+
+
+                            }
+
+
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+        private void SyncCodecitys()
+        {
+            int y = 0;
+
+           
+            int x = 0;
+            List<codecitysModel> Dataset = new List<codecitysModel>();
+            // Database connections
+            string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+            string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+            IDbConnection db2 = new SqlConnection(connNEWStr1);
+            using (SqlConnection connNew = new SqlConnection(connNEWStr1))
+            using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+            {
+                connNew.Open();
+                connOLD.Open();
+
+                string Query = $"TRUNCATE TABLE codecitys ";
+                SqlCommand cmd12 = new SqlCommand(Query, connNew);
+                var result = cmd12.ExecuteNonQuery();
+
+
+                Query = $"SELECT  count(*) FROM codecitys ";
+                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
+                var Count = cmd13.ExecuteScalar();
+
+
+                Query = $"SELECT  * FROM codecitys";
+
+
+
+                if (int.Parse(Count.ToString()) > 0)
+                {
+
+                    SqlCommand cOld = new SqlCommand(Query, connOLD);
+
+
+
+                    {
+
+                        using (SqlDataReader reader = cOld.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                codecitysModel line = new codecitysModel();
+                                // Assuming you want to display some columns from the table, e.g., id and some other column
+                                line.code = reader["code"].ToString();
+                                line.city = reader["city"].ToString();
+                   
+
+                                Dataset.Add(line);
+
+
+
+
+
+                                x++;
+                                //        label1.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
+                                if (x % 5000 == 0)
+                                {
+                                    db2.BulkInsert(Dataset);
+                                    Application.DoEvents();
+                                    Dataset.Clear();
+
+
+                                }
+
+
+
+                            }
+
+
+
+                            if (Dataset.Count > 0)
+                            {
+                                db2.BulkInsert(Dataset);
+                                Application.DoEvents();
+                                Dataset.Clear();
+                                //  label1.Text = "Done!";
+
+
+                            }
+
+
+                        }
+
+                    }
+                }
+            }
+    
+        }
+        private void SyncCODE3()
+        {
+            int y = 0;
+
+      
+            int x = 0;
+            List<code3Model> Dataset = new List<code3Model>();
+            // Database connections
+            string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+            string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+            IDbConnection db2 = new SqlConnection(connNEWStr1);
+            using (SqlConnection connNew = new SqlConnection(connNEWStr1))
+            using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+            {
+                connNew.Open();
+                connOLD.Open();
+
+                string Query = $"TRUNCATE TABLE code3 ";
+                SqlCommand cmd12 = new SqlCommand(Query, connNew);
+                var result = cmd12.ExecuteNonQuery();
+
+
+                Query = $"SELECT  count(*) FROM code3 ";
+                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
+                var Count = cmd13.ExecuteScalar();
+
+
+                Query = $"SELECT  * FROM code3";
+
+
+
+                if (int.Parse(Count.ToString()) > 0)
+                {
+
+                    SqlCommand cOld = new SqlCommand(Query, connOLD);
+
+
+
+                    {
+
+                        using (SqlDataReader reader = cOld.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                code3Model line = new code3Model();
+                                // Assuming you want to display some columns from the table, e.g., id and some other column
+                                line.code = reader["code"].ToString();
+                                line.city = reader["city"].ToString();
+                                line.photos = reader["photos"].ToString();
+                          
+                                   Dataset.Add(line);
+
+
+
+
+
+                                x++;
+                        //        label1.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
+                                if (x % 5000 == 0)
+                                {
+                                    db2.BulkInsert(Dataset);
+                                    Application.DoEvents();
+                                    Dataset.Clear();
+
+
+                                }
+
+
+
+                            }
+
+
+
+                            if (Dataset.Count > 0)
+                            {
+                                db2.BulkInsert(Dataset);
+                                Application.DoEvents();
+                                Dataset.Clear();
+                              //  label1.Text = "Done!";
+
+
+                            }
+
+
+                        }
+
+                    }
+                }
+            }
+       
+        }
+
+
+
     }
 
 }

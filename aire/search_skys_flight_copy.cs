@@ -10,6 +10,9 @@ using Microsoft.VisualBasic;
 using PagedList;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using Z.Dapper.Plus;
 
 
 namespace aire
@@ -383,6 +386,121 @@ namespace aire
             chkShortStays.Enabled = false;
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int y = 0;
+
+            button1.Enabled = false;
+            int x = 0;
+            List<classcomprGOOGLCOPY> Dataset = new List<classcomprGOOGLCOPY>();
+            // Database connections
+            string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+            string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+            IDbConnection db2 = new SqlConnection(connNEWStr1);
+            using (SqlConnection connNew = new SqlConnection(connNEWStr1))
+            using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+            {
+                connNew.Open();
+                connOLD.Open();
+
+                string Query = $"TRUNCATE TABLE comprGOOGLCOPY ";
+                SqlCommand cmd12 = new SqlCommand(Query, connNew);
+                var result = cmd12.ExecuteNonQuery();
+
+
+                Query = $"SELECT  count(*) FROM comprGOOGLCOPY ";
+                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
+                var Count = cmd13.ExecuteScalar();
+
+
+                Query = $"SELECT  * FROM comprGOOGLCOPY";
+
+
+
+                if (int.Parse(Count.ToString()) > 0)
+                {
+
+                    SqlCommand cOld = new SqlCommand(Query, connOLD);
+
+
+
+                    {
+
+                        using (SqlDataReader reader = cOld.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                classcomprGOOGLCOPY line = new classcomprGOOGLCOPY();
+                                // Assuming you want to display some columns from the table, e.g., id and some other column
+                                line.id = int.Parse(reader["id"].ToString());
+                                line.oldid = int.Parse(reader["id"].ToString());
+                                line.From = reader["From"].ToString();
+                                line.To = reader["To"].ToString();
+                                line.citys = reader["citys"].ToString();
+                                line.Dates = DateTime.Parse(reader["Dates"].ToString());
+                                line.Olde_price = double.Parse(reader["Olde_price"].ToString());
+                                line.New_price = double.Parse(reader["New_price"].ToString());
+                                line.Difference = double.Parse(reader["Difference"].ToString());
+                                line.Cheapest = double.Parse(reader["Cheapest"].ToString());
+                                line.Airline = reader["Airline"].ToString();
+                                line.Aircode = reader["Aircode"].ToString();
+                                line.Cabin = reader["Cabin"].ToString();
+                                line.Days = reader["Days"].ToString();
+                                line.Stops = reader["stops"].ToString();
+                                line.web = reader["web"].ToString();
+                                if (reader["IsTargetFound"] != null) {
+                                    line.IsTargetFound =null;
+                                }
+                                else
+                                {
+                                    line.IsTargetFound = bool.Parse(reader["IsTargetFound"].ToString());
+                                }
+                                line.Name = reader["name"].ToString();
+                                line.NewUploadDate = DateTime.Parse(reader["NewUploadDate"].ToString());
+                                //line.OtaDiscount = float.Parse(reader["OtaDiscount"].ToString());
+                                //line.OtaTotal = double.Parse(reader["OtaTotal"].ToString());
+                                Dataset.Add(line);
+
+
+
+
+
+                                x++;
+                                label1.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
+                                if (x % 5000 == 0)
+                                {
+                                    db2.BulkInsert(Dataset);
+                                    Application.DoEvents();
+                                    Dataset.Clear();
+
+
+                                }
+
+
+
+                            }
+
+
+
+                            if (Dataset.Count > 0)
+                            {
+                                db2.BulkInsert(Dataset);
+                                Application.DoEvents();
+                                Dataset.Clear();
+                                label1.Text = "Done!";
+
+
+                            }
+
+
+                        }
+
+                    }
+                }
+            }
+            button1.Enabled = false;
+        }
+
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
            
@@ -710,7 +828,7 @@ namespace aire
                 bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][12].ToString(), d.dt.Rows[i][11].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
 
                 if (IsTargetFound.HasValue && IsTargetFound.Value)
                 {

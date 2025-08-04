@@ -51,6 +51,10 @@
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
+            this.textBoxCabin = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBoxOtaDisc = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -143,7 +147,7 @@
             // button1
             // 
             this.button1.BackColor = System.Drawing.Color.White;
-            this.button1.Location = new System.Drawing.Point(258, 289);
+            this.button1.Location = new System.Drawing.Point(256, 398);
             this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(61, 28);
@@ -157,7 +161,7 @@
             this.radioButton1.AutoSize = true;
             this.radioButton1.Font = new System.Drawing.Font("Lucida Handwriting", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.radioButton1.ForeColor = System.Drawing.Color.White;
-            this.radioButton1.Location = new System.Drawing.Point(16, 411);
+            this.radioButton1.Location = new System.Drawing.Point(258, 440);
             this.radioButton1.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(241, 27);
@@ -172,7 +176,7 @@
             this.radioButton2.AutoSize = true;
             this.radioButton2.Font = new System.Drawing.Font("Lucida Handwriting", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.radioButton2.ForeColor = System.Drawing.Color.White;
-            this.radioButton2.Location = new System.Drawing.Point(16, 438);
+            this.radioButton2.Location = new System.Drawing.Point(512, 440);
             this.radioButton2.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(345, 27);
@@ -184,7 +188,7 @@
             // button2
             // 
             this.button2.BackColor = System.Drawing.Color.White;
-            this.button2.Location = new System.Drawing.Point(16, 289);
+            this.button2.Location = new System.Drawing.Point(12, 398);
             this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(82, 28);
@@ -220,7 +224,7 @@
             // button4
             // 
             this.button4.BackColor = System.Drawing.Color.White;
-            this.button4.Location = new System.Drawing.Point(172, 364);
+            this.button4.Location = new System.Drawing.Point(93, 436);
             this.button4.Margin = new System.Windows.Forms.Padding(4);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(147, 28);
@@ -234,12 +238,12 @@
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Palatino Linotype", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(17, 364);
+            this.label6.Location = new System.Drawing.Point(7, 437);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(86, 27);
+            this.label6.Size = new System.Drawing.Size(88, 27);
             this.label6.TabIndex = 17;
-            this.label6.Text = "Uplead :";
+            this.label6.Text = "Upload :";
             // 
             // textBox6
             // 
@@ -284,7 +288,7 @@
             // button5
             // 
             this.button5.BackColor = System.Drawing.Color.White;
-            this.button5.Location = new System.Drawing.Point(383, 439);
+            this.button5.Location = new System.Drawing.Point(865, 439);
             this.button5.Margin = new System.Windows.Forms.Padding(4);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(140, 28);
@@ -296,7 +300,7 @@
             // button6
             // 
             this.button6.BackColor = System.Drawing.Color.White;
-            this.button6.Location = new System.Drawing.Point(106, 289);
+            this.button6.Location = new System.Drawing.Point(102, 398);
             this.button6.Margin = new System.Windows.Forms.Padding(4);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(87, 28);
@@ -305,12 +309,56 @@
             this.button6.UseVisualStyleBackColor = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Palatino Linotype", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.ForeColor = System.Drawing.Color.White;
+            this.label8.Location = new System.Drawing.Point(19, 284);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(75, 27);
+            this.label8.TabIndex = 24;
+            this.label8.Text = "Cabin :";
+            // 
+            // textBoxCabin
+            // 
+            this.textBoxCabin.Location = new System.Drawing.Point(172, 289);
+            this.textBoxCabin.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCabin.Name = "textBoxCabin";
+            this.textBoxCabin.Size = new System.Drawing.Size(145, 22);
+            this.textBoxCabin.TabIndex = 25;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Palatino Linotype", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.ForeColor = System.Drawing.Color.White;
+            this.label9.Location = new System.Drawing.Point(19, 324);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(150, 27);
+            this.label9.TabIndex = 26;
+            this.label9.Text = "OTA Discount :";
+            // 
+            // textBoxOtaDisc
+            // 
+            this.textBoxOtaDisc.Location = new System.Drawing.Point(172, 329);
+            this.textBoxOtaDisc.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxOtaDisc.Name = "textBoxOtaDisc";
+            this.textBoxOtaDisc.Size = new System.Drawing.Size(145, 22);
+            this.textBoxOtaDisc.TabIndex = 27;
+            // 
             // upload_target
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Tan;
             this.ClientSize = new System.Drawing.Size(1105, 478);
+            this.Controls.Add(this.textBoxOtaDisc);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.textBoxCabin);
+            this.Controls.Add(this.label8);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.dateTimePicker2);
@@ -368,5 +416,9 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker2;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox textBoxCabin;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBoxOtaDisc;
     }
 }

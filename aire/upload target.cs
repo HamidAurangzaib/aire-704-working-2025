@@ -49,7 +49,7 @@ namespace aire
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (textBox1.Text == "" || textBox2.Text == "" || textBox3.Text == "" || textBox6.Text == "")
+            if (textBox1.Text == "" || textBox2.Text == "" || textBox3.Text == "" || textBox6.Text == "" || textBoxCabin.Text == "" || textBoxOtaDisc.Text == "")
             {
                 MessageBox.Show("Please fill all values");
             }
@@ -65,6 +65,8 @@ namespace aire
                 dr[4] = dateTimePicker2.Text;
                 dr[5] = textBox6.Text;
                 dr[6] = textBox3.Text;
+                dr[7] = textBoxCabin.Text;
+                dr[10] = textBoxOtaDisc.Text;
 
                 d.dt.Rows.Add(dr);
                 d.da.Update(d.dt);
@@ -75,6 +77,8 @@ namespace aire
                 dateTimePicker1.Text = DateTime.Now.ToString();
                 dateTimePicker2.Text = DateTime.Now.ToString();
                 textBox6.Text = "";
+                textBoxCabin.Text = "";
+                textBoxOtaDisc.Text = "";
                 MessageBox.Show("Record inserted successfully");
             }
         }
@@ -117,6 +121,8 @@ namespace aire
                     dateTimePicker1.Text = DateTime.Now.ToString();
                     dateTimePicker2.Text = DateTime.Now.ToString();
                     textBox6.Text = "";
+                    textBoxCabin.Text = "";
+                    textBoxOtaDisc.Text = "";
 
                     MessageBox.Show("Record deleted successfully.");
                 }
@@ -148,6 +154,7 @@ namespace aire
             // }
 
             d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
+            d.cmdd.CommandTimeout = 0; //in seconds
             d.cmdd.ExecuteNonQuery();
 
             MessageBox.Show("Finished");
@@ -192,7 +199,7 @@ namespace aire
                     for (int i = 0; i < cntr; i++)
                     {
                         j++;
-                        sql += "insert into tblTarget  values ('" + dt.Rows[i]["FROM"].ToString() + "','" + dt.Rows[i]["TO"].ToString() + "','"  + dt.Rows[i]["FROM DATE"].ToString() + "','" + dt.Rows[i]["TO DATE"].ToString() + "','" + dt.Rows[i]["PRICE"].ToString() + "','" + dt.Rows[i]["AIRCODE"].ToString() + "','" + dt.Rows[i]["CABIN"].ToString() + "','" + dt.Rows[i]["STOPS"].ToString() + "','" + dt.Rows[i]["DAYS"].ToString() + "')";
+                        sql += "insert into tblTarget  values ('" + dt.Rows[i]["FROM"].ToString() + "','" + dt.Rows[i]["TO"].ToString() + "','"  + dt.Rows[i]["FROM DATE"].ToString() + "','" + dt.Rows[i]["TO DATE"].ToString() + "','" + dt.Rows[i]["PRICE"].ToString() + "','" + dt.Rows[i]["AIRCODE"].ToString() + "','" + dt.Rows[i]["CABIN"].ToString() + "','" + dt.Rows[i]["STOPS"].ToString() + "','" + dt.Rows[i]["DAYS"].ToString() + "','" + dt.Rows[i]["OTADiscount"].ToString() + "')";
                         if (j == 10001)
                         {
                             b++;
@@ -313,6 +320,8 @@ namespace aire
             dateTimePicker2.Text = dataGridView1.Rows[index].Cells[4].Value.ToString();
             textBox6.Text = dataGridView1.Rows[index].Cells[5].Value.ToString();
             textBox3.Text = dataGridView1.Rows[index].Cells[6].Value.ToString();
+            textBoxCabin.Text = dataGridView1.Rows[index].Cells[7].Value.ToString();
+            textBoxOtaDisc.Text = dataGridView1.Rows[index].Cells[10].Value.ToString();
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -361,6 +370,8 @@ namespace aire
                     d.cmdd.Parameters.Add("@toDate", SqlDbType.Date).Value = dateTimePicker2.Text;
                     d.cmdd.Parameters.Add("@price", SqlDbType.Float, 20).Value = float.Parse(textBox6.Text);
                     d.cmdd.Parameters.Add("@aircode", SqlDbType.VarChar).Value = textBox3.Text;
+                    d.cmdd.Parameters.Add("@cabin", SqlDbType.VarChar).Value = textBoxCabin.Text;
+                    d.cmdd.Parameters.Add("@otaDiscount", SqlDbType.Float, 20).Value = float.Parse(textBoxOtaDisc.Text);
 
                     d.dr = d.cmdd.ExecuteReader(); // Perform the deletion
                     d.dt.Load(d.dr);
@@ -373,6 +384,8 @@ namespace aire
                     dateTimePicker1.Text = DateTime.Now.ToString();
                     dateTimePicker2.Text = DateTime.Now.ToString();
                     textBox6.Text = "";
+                    textBoxCabin.Text = "";
+                    textBoxOtaDisc.Text = "";
 
                     MessageBox.Show("Record updated successfully.");
                 }

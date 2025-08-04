@@ -23,7 +23,25 @@ namespace aire
         //public SqlCommandBuilder cmd;
         public DataSet ds= new DataSet();
         public DataView dview;
-       
+
+
+        public void connecter2()
+        {
+            if (cn.State == ConnectionState.Closed || cn.State == ConnectionState.Broken)
+            {
+                //cn.ConnectionString = "Data Source=ALEEHYDER\\SQLEXPRESS; Database=DB_A61545_andycom;Integrated Security=true;";
+                cn.ConnectionString = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+                cn.Open();
+            }
+        }
+
+        public void deconnecter2()
+        {
+            if (cn.State == ConnectionState.Open)
+            {
+                cn.Close();
+            }
+        }
 
         public void connecter()
         {

@@ -236,7 +236,7 @@ namespace aire
                 bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][16].ToString()) : 0, !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][17].ToString()) : double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
 
                 if (IsTargetFound.HasValue && IsTargetFound.Value)
                 {
@@ -265,21 +265,21 @@ namespace aire
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
 
-                        if (Convert.ToDouble(row.Cells[6].Value) < 0)
+                        if (Convert.ToDouble(row.Cells[8].Value) < 0)
                         {
-                            row.Cells[6].Style.BackColor = Color.LightGreen;
+                            row.Cells[8].Style.BackColor = Color.LightGreen;
                         }
-                        else if (Convert.ToDouble(row.Cells[6].Value) > 0)
+                        else if (Convert.ToDouble(row.Cells[8].Value) > 0)
                         {
-                            row.Cells[6].Style.BackColor = Color.Red;
+                            row.Cells[8].Style.BackColor = Color.Red;
                         }
-                        if (Convert.ToDouble(row.Cells[6].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
+                        if (Convert.ToDouble(row.Cells[8].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
                         {
-                            row.Cells[6].Style.BackColor = Color.Orange;
+                            row.Cells[8].Style.BackColor = Color.Orange;
                         }
-                        if (Convert.ToDouble(row.Cells[6].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
+                        if (Convert.ToDouble(row.Cells[8].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
                         {
-                            row.Cells[6].Style.BackColor = Color.Gray;
+                            row.Cells[8].Style.BackColor = Color.Gray;
 
                         }
                     }
@@ -598,7 +598,7 @@ namespace aire
                     bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
 
                     int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                    double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+                    double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][16].ToString()), double.Parse(d.dt.Rows[i][17].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
 
                     if (IsTargetFound.HasValue && IsTargetFound.Value)
                     {

@@ -108,7 +108,7 @@ namespace aire
                 d.cmdd.Parameters.Add("@Airline", SqlDbType.VarChar, 100).Value = AirlineDDL.SelectedValue.ToString();
                 d.cmdd.Parameters.Add("@From", SqlDbType.VarChar, 100).Value = txtFrom.Text.ToString() != "" ? txtFrom.Text.ToString() : "Not Selected";
                 d.cmdd.Parameters.Add("@To", SqlDbType.VarChar, 100).Value = textTo.Text.ToString() != "" ? textTo.Text.ToString() : "Not Selected";
-                d.cmdd.Parameters.Add("@Days", SqlDbType.VarChar, 100).Value = /*strDays != null ? strDays.ToString() : */"Not Selected";
+                d.cmdd.Parameters.Add("@Days", SqlDbType.VarChar, 100).Value = strDays != null ? strDays.ToString() : "Not Selected";
                 d.cmdd.Parameters.Add("@StartDate", SqlDbType.VarChar, 100).Value = date1.Text;
                 d.cmdd.Parameters.Add("@EndDate", SqlDbType.VarChar, 100).Value = date2.Text;
                 d.cmdd.Connection = d.cn;
@@ -402,7 +402,7 @@ namespace aire
         private void RD14Days_CheckedChanged(object sender, EventArgs e)
         {
             days = 14;
-            strDays = "14 Days";
+            strDays = "14 day";
         }
     }
 }

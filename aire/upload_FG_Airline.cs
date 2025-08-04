@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using Z.Dapper.Plus;
 using ExcelDataReader;
+using Microsoft.Office.Core;
 
 
 namespace aire
@@ -25,6 +26,7 @@ namespace aire
         DataTable dt;
 
         ado d = new ado();
+        ado d2 = new ado();
         public object DataSate { get; private set; }
         int bb = 0;
         string adrss;
@@ -344,6 +346,8 @@ namespace aire
                 // Delete the item from the database using the same connection
                 using (SqlCommand cmd = new SqlCommand())
                 {
+
+                    // old
                     d.connecter(); // Reuse the existing database connection
                     cmd.Connection = d.cn;
 
@@ -352,6 +356,17 @@ namespace aire
                     cmd.Parameters.AddWithValue("@Name", selectedItemText);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
+
+                    //new
+                    //cmd.Parameters.Clear();
+                    //d.connecter2(); // Reuse the existing database connection
+                    //cmd.Connection = d.cn;
+
+                    //string deleteQuery2 = $"DELETE FROM {table} WHERE {name} = @Name";
+                    //cmd.CommandText = deleteQuery2;
+                    //cmd.Parameters.AddWithValue("@Name", selectedItemText);
+
+                    //int rowsAffected2 = cmd.ExecuteNonQuery();
 
                     if (rowsAffected > 0)
                     {
@@ -423,7 +438,123 @@ namespace aire
 			}
 		}
 
-		private void label7_Click(object sender, EventArgs e)
+        private void button8_Click(object sender, EventArgs e)
+        {
+            int y = 0;
+         
+                button8.Enabled = false;
+                int x = 0;
+                List<classGFAirlineNEW> Dataset = new List<classGFAirlineNEW>();
+                // Database connections
+                string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+                string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+                IDbConnection db2 = new SqlConnection(connNEWStr1);
+                using (SqlConnection connNew = new SqlConnection(connNEWStr1))
+                using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+                {
+                    connNew.Open();
+                    connOLD.Open();
+                   
+                    string Query = $"TRUNCATE TABLE  comprGOOGLAirline ";
+                    SqlCommand cmd12 = new SqlCommand(Query, connNew);
+                cmd12.CommandTimeout = 0;
+                    cmd12.ExecuteNonQuery();
+
+
+                Query = $"SELECT  count(*) FROM comprGOOGLAirline ";
+                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
+                var Count = cmd13.ExecuteScalar();
+
+                Query = $"SELECT  * FROM comprGOOGLAirline";
+
+
+
+                    if (int.Parse(Count.ToString()) > 0)
+                    {
+                     
+                        SqlCommand cOld = new SqlCommand(Query, connOLD);
+
+
+
+                        {
+
+                            using (SqlDataReader reader = cOld.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    classGFAirlineNEW line = new classGFAirlineNEW();
+                                    // Assuming you want to display some columns from the table, e.g., id and some other column
+                                    line.id = int.Parse(reader["id"].ToString());
+                                    line.oldid = int.Parse(reader["id"].ToString());
+                                    line.From = reader["From"].ToString();
+                                    line.To = reader["To"].ToString();
+                                    line.citys = reader["citys"].ToString();
+                                    line.Dates = DateTime.Parse(reader["Dates"].ToString());
+                                    line.Olde_price = double.Parse(reader["Olde_price"].ToString());
+                                    line.New_price = double.Parse(reader["New_price"].ToString());
+                                    line.Difference = double.Parse(reader["Difference"].ToString());
+                                    line.Cheapest = double.Parse(reader["Cheapest"].ToString());
+                                    line.Airline = reader["Airline"].ToString();
+                                    line.Aircode = reader["Aircode"].ToString();
+                                    line.Cabin = reader["Cabin"].ToString();
+                                    line.Days = reader["Days"].ToString();
+                                    line.Stops = reader["stops"].ToString();
+                                    line.web = reader["web"].ToString();
+                                    line.IsTargetFound = bool.Parse(reader["IsTargetFound"].ToString());
+                                    line.Name = reader["name"].ToString();
+                                    line.NewUploadDate = DateTime.Parse(reader["NewUploadDate"].ToString());
+                                    line.OtaDiscount = double.Parse(reader["OtaDiscount"].ToString());
+                                    line.OtaTotal = double.Parse(reader["OtaTotal"].ToString());
+
+                                    Dataset.Add(line);
+
+
+
+
+
+                                    x++;
+                                label8.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
+                                if (x % 5000 == 0)
+                                    {
+                                        db2.BulkInsert(Dataset);
+                                        Application.DoEvents();
+                                        Dataset.Clear();
+
+
+                                    }
+
+
+
+                                }
+
+
+
+                                if (Dataset.Count > 0)
+                                {  
+                                    db2.BulkInsert(Dataset);
+                                    Application.DoEvents();
+                                    Dataset.Clear();
+                                    label1.Text = "Done!";
+
+
+                                }
+
+
+                            }
+
+                        }
+
+
+                    }
+                }
+                // timer1.Enabled = true;
+                button8.Enabled = true;
+            
+
+           
+        }
+
+        private void label7_Click(object sender, EventArgs e)
         {
 
         }
@@ -448,6 +579,11 @@ namespace aire
             d.cmdd.CommandText = deleteOldFiles;
             d.cmdd.CommandTimeout = 0;
             d.cmdd.ExecuteNonQuery();
+
+
+
+            d2.cmdd.CommandText = "delete from comprGOOGLAirline where name='";
+
             //d.cmdd = new SqlCommand("EXEC " + deleteOldFiles + "", d.cn);
             //d.cmdd.CommandTimeout = 0;
             //d.cmdd.ExecuteNonQuery();
@@ -542,7 +678,11 @@ namespace aire
                 d.cmdd = new SqlCommand("exec upd_cmprgoogleAirline", d.cn);
                 d.cmdd.CommandTimeout = 0; //in seconds
                 d.cmdd.ExecuteNonQuery();
-                
+
+                d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
+                d.cmdd.CommandTimeout = 0; //in seconds
+                d.cmdd.ExecuteNonQuery();
+
                 dt = null;
                 d.dt = null;
                 MessageBox.Show("finish");
@@ -570,6 +710,7 @@ namespace aire
         {
 			d.dt.Rows.Clear();
 			d.connecter();
+            d2.connecter2();
 
 			button3.Visible = false;
             button1.Enabled = false;
