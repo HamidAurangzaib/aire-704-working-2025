@@ -70,15 +70,18 @@ BEGIN
       AND NOT EXISTS (
           SELECT 1
           FROM dbo.comprGOOGLAirline cheaper
-          WHERE cheaper.IsTargetFound = 1
-            AND cheaper.[From]   = c.[From]
+          WHERE cheaper.[From]   = c.[From]
             AND cheaper.[To]     = c.[To]
             AND cheaper.Airline  = c.Airline
             AND cheaper.Stops    = c.Stops
             AND cheaper.Cabin    = c.Cabin
             AND MONTH(cheaper.Dates) = MONTH(c.Dates)
             AND YEAR(cheaper.Dates)  = YEAR(c.Dates)
-            AND cheaper.New_price    < c.New_price
+            AND (
+                (cheaper.IsTargetFound = 1 AND cheaper.New_price < c.New_price)
+                OR
+                (cheaper.Olde_price > 0 AND cheaper.Olde_price < c.New_price)
+            )
       );
 
     -- Step 3: IsTargetDeal — Blue rows whose New_price is strictly lower than
