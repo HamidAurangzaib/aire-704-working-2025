@@ -621,7 +621,7 @@ namespace aire
             MessageBox.Show("Finish!!!!");
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private async void button4_Click(object sender, EventArgs e)
         {
 			if (ddlName.SelectedIndex == 0)
 			{
@@ -630,67 +630,81 @@ namespace aire
 			}
 
 			string ddlValue = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
-                
+
                 exe1 = "modifAirline";
                 exe2 = "deleteOldDateIngoogleAirlinech";
                 exe4 = "doblerowschAirline";
 
                 exe6 = "cmprGAirline";
                 exe7 = "doblerowsAirline";
-       
 
-            
-            if (textBox1.Text != "")
+            button4.Enabled = false;
+            button4.Text = "Processing...";
+            Cursor = Cursors.WaitCursor;
+
+            try
             {
-                d.cmdd = new SqlCommand("exec " + exe1 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+                if (textBox1.Text != "")
+                {
+                    await Task.Run(() =>
+                    {
+                        d.cmdd = new SqlCommand("exec " + exe1 + "", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
 
+                        d.cmdd = new SqlCommand("exec " + exe4 + "", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
 
-                d.cmdd = new SqlCommand("exec " + exe4 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+                        d.cmdd = new SqlCommand(exe2, d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.CommandType = CommandType.StoredProcedure;
+                        d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
+                        d.cmdd.ExecuteNonQuery();
 
-				d.cmdd.Parameters.Clear(); // Clear existing parameters
-				d.cmdd.CommandType = CommandType.StoredProcedure;
-				d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
-				d.cmdd.Connection = d.cn;
+                        d.cmdd = new SqlCommand(exe6, d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.CommandType = CommandType.StoredProcedure;
+                        d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
+                        d.cmdd.ExecuteNonQuery();
 
-				d.cmdd.CommandText = exe2;
-				d.cmdd.CommandTimeout = 0;
-				d.cmdd.ExecuteNonQuery();
+                        d.cmdd = new SqlCommand("updatecmprGAirline", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.CommandType = CommandType.StoredProcedure;
+                        d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
+                        d.cmdd.ExecuteNonQuery();
 
-				d.cmdd.CommandText = exe6;
-				d.cmdd.CommandTimeout = 0;
-				d.cmdd.ExecuteNonQuery();
+                        d.cmdd = new SqlCommand("exec " + exe7 + "", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
 
-                d.cmdd.CommandText = "updatecmprGAirline";
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+                        d.cmdd = new SqlCommand("exec upd_cmprgoogleAirline", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
 
-                d.cmdd.Parameters.Clear(); // Clear existing parameters
-                d.cmdd.CommandType = CommandType.Text;
-                d.cmdd = new SqlCommand("exec " + exe7 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+                        d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
+                    });
 
-                d.cmdd = new SqlCommand("exec upd_cmprgoogleAirline", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+                    dt = null;
+                    d.dt = null;
+                    MessageBox.Show("Finish!");
+                }
 
-                d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
-
-                dt = null;
-                d.dt = null;
-                MessageBox.Show("finish");
-
+                await Task.Run(() =>
+                {
+                    d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
+                    d.cmdd.CommandTimeout = 0;
+                    d.cmdd.ExecuteNonQuery();
+                });
             }
-
-            d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
-            d.cmdd.CommandTimeout = 0; //in seconds
-            d.cmdd.ExecuteNonQuery();
+            finally
+            {
+                button4.Enabled = true;
+                button4.Text = "Finish";
+                Cursor = Cursors.Default;
+            }
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
