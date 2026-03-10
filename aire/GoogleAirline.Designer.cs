@@ -85,6 +85,7 @@
             this.STOPS = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DateNewPriceChanged = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox7.SuspendLayout();
@@ -100,11 +101,11 @@
             this.dataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView2.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Location = new System.Drawing.Point(13, 219);
+            this.dataGridView2.Location = new System.Drawing.Point(13, 323);
             this.dataGridView2.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersWidth = 51;
-            this.dataGridView2.Size = new System.Drawing.Size(1456, 608);
+            this.dataGridView2.Size = new System.Drawing.Size(1456, 504);
             this.dataGridView2.TabIndex = 78;
             // 
             // label6
@@ -155,7 +156,8 @@
             this.Column11,
             this.STOPS,
             this.Column10,
-            this.Column5});
+            this.Column5,
+            this.DateNewPriceChanged});
             this.dataGridView1.Location = new System.Drawing.Point(13, 219);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridView1.Name = "dataGridView1";
@@ -667,6 +669,12 @@
             this.Column5.MinimumWidth = 6;
             this.Column5.Name = "Column5";
             // 
+            // DateNewPriceChanged
+            // 
+            this.DateNewPriceChanged.HeaderText = "DateNewPriceChanged";
+            this.DateNewPriceChanged.MinimumWidth = 6;
+            this.DateNewPriceChanged.Name = "DateNewPriceChanged";
+            // 
             // GoogleAirline
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -753,5 +761,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn STOPS;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DateNewPriceChanged;
     }
 }

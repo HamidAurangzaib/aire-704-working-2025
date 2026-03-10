@@ -7,7 +7,6 @@ using System.IO;
 using System.Collections.Generic;
 using Z.Dapper.Plus;
 using ExcelDataReader;
-using Microsoft.Office.Core;
 
 
 namespace aire
