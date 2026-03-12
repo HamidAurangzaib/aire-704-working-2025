@@ -51,6 +51,7 @@
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.textBoxCabin = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
