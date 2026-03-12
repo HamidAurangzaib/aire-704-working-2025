@@ -42,6 +42,9 @@
             this.ddlDays = new System.Windows.Forms.ComboBox();
             this.Days = new System.Windows.Forms.Label();
             this.chkTarget = new System.Windows.Forms.CheckBox();
+            this.radioTargetAll = new System.Windows.Forms.RadioButton();
+            this.radioTargetDeals = new System.Windows.Forms.RadioButton();
+            this.radioTargetMonths = new System.Windows.Forms.RadioButton();
             this.label29 = new System.Windows.Forms.Label();
             this.txtAircode = new System.Windows.Forms.TextBox();
             this.label28 = new System.Windows.Forms.Label();
@@ -168,6 +171,9 @@
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.radioTargetMonths);
+            this.groupBox7.Controls.Add(this.radioTargetDeals);
+            this.groupBox7.Controls.Add(this.radioTargetAll);
             this.groupBox7.Controls.Add(this.groupBox1);
             this.groupBox7.Controls.Add(this.ddlCabin);
             this.groupBox7.Controls.Add(this.ddlStops);
@@ -293,6 +299,42 @@
             this.chkTarget.TabIndex = 89;
             this.chkTarget.Text = "Targets Only";
             this.chkTarget.UseVisualStyleBackColor = true;
+            this.chkTarget.CheckedChanged += new System.EventHandler(this.chkTarget_CheckedChanged);
+            //
+            // radioTargetAll
+            //
+            this.radioTargetAll.AutoSize = true;
+            this.radioTargetAll.Checked = true;
+            this.radioTargetAll.Enabled = false;
+            this.radioTargetAll.Location = new System.Drawing.Point(660, 148);
+            this.radioTargetAll.Name = "radioTargetAll";
+            this.radioTargetAll.Size = new System.Drawing.Size(42, 20);
+            this.radioTargetAll.TabIndex = 90;
+            this.radioTargetAll.TabStop = true;
+            this.radioTargetAll.Text = "All";
+            this.radioTargetAll.UseVisualStyleBackColor = true;
+            //
+            // radioTargetDeals
+            //
+            this.radioTargetDeals.AutoSize = true;
+            this.radioTargetDeals.Enabled = false;
+            this.radioTargetDeals.Location = new System.Drawing.Point(710, 148);
+            this.radioTargetDeals.Name = "radioTargetDeals";
+            this.radioTargetDeals.Size = new System.Drawing.Size(85, 20);
+            this.radioTargetDeals.TabIndex = 91;
+            this.radioTargetDeals.Text = "Deals only";
+            this.radioTargetDeals.UseVisualStyleBackColor = true;
+            //
+            // radioTargetMonths
+            //
+            this.radioTargetMonths.AutoSize = true;
+            this.radioTargetMonths.Enabled = false;
+            this.radioTargetMonths.Location = new System.Drawing.Point(803, 148);
+            this.radioTargetMonths.Name = "radioTargetMonths";
+            this.radioTargetMonths.Size = new System.Drawing.Size(100, 20);
+            this.radioTargetMonths.TabIndex = 92;
+            this.radioTargetMonths.Text = "Months only";
+            this.radioTargetMonths.UseVisualStyleBackColor = true;
             // 
             // label29
             // 
@@ -744,6 +786,9 @@
         private System.Windows.Forms.CheckBox checkRedDiff;
         private System.Windows.Forms.CheckBox checkGreenDiff;
         private System.Windows.Forms.CheckBox chkShortStays;
+        private System.Windows.Forms.RadioButton radioTargetAll;
+        private System.Windows.Forms.RadioButton radioTargetDeals;
+        private System.Windows.Forms.RadioButton radioTargetMonths;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;

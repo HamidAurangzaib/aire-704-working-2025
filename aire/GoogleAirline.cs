@@ -238,6 +238,9 @@ namespace aire
                 bool? IsMonthTarget = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
                 bool? IsTargetDeal  = d.dt.Columns.Count > 22 ? d.dt.Rows[i][22] as bool? : null;
 
+                if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
+
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                 double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][16].ToString()) : 0, !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][17].ToString()) : double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
@@ -424,6 +427,9 @@ namespace aire
                 bool? IsMonthTarget = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
                 bool? IsTargetDeal  = d.dt.Columns.Count > 22 ? d.dt.Rows[i][22] as bool? : null;
 
+                if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
+
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                 double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
@@ -536,6 +542,15 @@ namespace aire
             }
         }
 
+        private void chkTarget_CheckedChanged(object sender, EventArgs e)
+        {
+            bool on = chkTarget.Checked;
+            radioTargetAll.Enabled    = on;
+            radioTargetDeals.Enabled  = on;
+            radioTargetMonths.Enabled = on;
+            if (!on) radioTargetAll.Checked = true;
+        }
+
         private void radioGreater_CheckedChanged(object sender, EventArgs e)
         {
             txtMaxPrice.Visible = false;
@@ -613,6 +628,9 @@ namespace aire
                     bool? IsOldTarget   = d.dt.Columns.Count > 20 ? d.dt.Rows[i][20] as bool? : null;
                     bool? IsMonthTarget = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
                     bool? IsTargetDeal  = d.dt.Columns.Count > 22 ? d.dt.Rows[i][22] as bool? : null;
+
+                    if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                    if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
 
                     int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                     double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][16].ToString()), double.Parse(d.dt.Rows[i][17].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
