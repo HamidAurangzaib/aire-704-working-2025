@@ -324,6 +324,31 @@ namespace aire
             textBoxOtaDisc.Text = dataGridView1.Rows[index].Cells[10].Value.ToString();
         }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            string from    = textBox1.Text.Trim();
+            string to      = textBox2.Text.Trim();
+            string aircode = textBox3.Text.Trim();
+            string cabin   = textBoxCabin.Text.Trim();
+
+            string sql = "SELECT * FROM tblTarget WHERE 1=1";
+            if (from    != "") sql += " AND [From]   = '" + from    + "'";
+            if (to      != "") sql += " AND [To]     = '" + to      + "'";
+            if (aircode != "") sql += " AND Aircode  = '" + aircode + "'";
+            if (cabin   != "") sql += " AND Cabin    = '" + cabin   + "'";
+
+            if (d.dt != null) d.dt.Rows.Clear();
+            d.ds = new DataSet();
+            d.da = new SqlDataAdapter(sql, d.cn);
+            d.da.Fill(d.ds, "tblTarget");
+            d.dt = d.ds.Tables["tblTarget"];
+            dataGridView1.DataSource = d.dt;
+            dataGridView1.Columns[0].Visible = false;
+
+            if (d.dt.Rows.Count == 0)
+                MessageBox.Show("No matching records found.");
+        }
+
         private void button5_Click(object sender, EventArgs e)
         {
             // Display a confirmation dialog

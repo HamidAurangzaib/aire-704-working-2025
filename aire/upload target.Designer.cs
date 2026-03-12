@@ -143,9 +143,21 @@
             this.label4.Size = new System.Drawing.Size(94, 27);
             this.label4.TabIndex = 8;
             this.label4.Text = "To Date :";
-            // 
+            //
+            // button7
+            //
+            this.button7.BackColor = System.Drawing.Color.LimeGreen;
+            this.button7.Location = new System.Drawing.Point(192, 398);
+            this.button7.Margin = new System.Windows.Forms.Padding(4);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(60, 28);
+            this.button7.TabIndex = 28;
+            this.button7.Text = "Search";
+            this.button7.UseVisualStyleBackColor = false;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            //
             // button1
-            // 
+            //
             this.button1.BackColor = System.Drawing.Color.White;
             this.button1.Location = new System.Drawing.Point(256, 398);
             this.button1.Margin = new System.Windows.Forms.Padding(4);
@@ -372,6 +384,7 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.radioButton2);
             this.Controls.Add(this.radioButton1);
+            this.Controls.Add(this.button7);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -420,5 +433,6 @@
         private System.Windows.Forms.TextBox textBoxCabin;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxOtaDisc;
+        private System.Windows.Forms.Button button7;
     }
 }
