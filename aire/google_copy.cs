@@ -523,52 +523,61 @@ namespace aire
             }
             string ddlValue = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
 
-            if (textBox1.Text != "")
+            button4.Enabled = false;
+            button4.Text = "Processing...";
+            Cursor = Cursors.WaitCursor;
+
+            try
             {
-                d.cmdd = new SqlCommand("exec " + finsh4 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
-
-                d.cmdd.Parameters.Clear(); // Clear existing parameters
-                d.cmdd.CommandType = CommandType.StoredProcedure;
-                d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
-                d.cmdd.Connection = d.cn;
-
-                d.cmdd.CommandText = "deleteOldDateIngooglechCOPY";
-                d.cmdd.CommandTimeout = 0;
-                d.cmdd.ExecuteNonQuery();
-                await Task.Run(() => {
-
-
-
-                    d.cmdd.CommandText = finsh6;
-                    d.cmdd.CommandTimeout = 0; //in seconds
-                    d.cmdd.ExecuteNonQuery();
-
-                });
-
-                d.cmdd.CommandText = "cmprGcopyUpdate";
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
-
-                d.cmdd.Parameters.Clear(); // Clear existing parameters
-                d.cmdd.CommandType = CommandType.Text;
-                d.cmdd = new SqlCommand("exec " + finsh7 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
-
-
-
-                if (domest == 1)
+                if (textBox1.Text != "")
                 {
-                    d.cmdd = new SqlCommand("exec upd_cmprgoogleCOPY", d.cn);
-                    d.cmdd.CommandTimeout = 0; //in seconds
-                    d.cmdd.ExecuteNonQuery();
-                }
-                dt = null;
-                d.dt = null;
-                MessageBox.Show("finish");
+                    await Task.Run(() =>
+                    {
+                        d.cmdd = new SqlCommand("exec " + finsh4 + "", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
 
+                        d.cmdd.Parameters.Clear();
+                        d.cmdd.CommandType = CommandType.StoredProcedure;
+                        d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
+                        d.cmdd.Connection = d.cn;
+
+                        d.cmdd.CommandText = "deleteOldDateIngooglechCOPY";
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
+
+                        d.cmdd.CommandText = finsh6;
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
+
+                        d.cmdd.CommandText = "cmprGcopyUpdate";
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
+
+                        d.cmdd.Parameters.Clear();
+                        d.cmdd.CommandType = CommandType.Text;
+                        d.cmdd = new SqlCommand("exec " + finsh7 + "", d.cn);
+                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.ExecuteNonQuery();
+
+                        if (domest == 1)
+                        {
+                            d.cmdd = new SqlCommand("exec upd_cmprgoogleCOPY", d.cn);
+                            d.cmdd.CommandTimeout = 0;
+                            d.cmdd.ExecuteNonQuery();
+                        }
+                    });
+
+                    dt = null;
+                    d.dt = null;
+                    MessageBox.Show("Finish!");
+                }
+            }
+            finally
+            {
+                button4.Enabled = true;
+                button4.Text = "Finish";
+                Cursor = Cursors.Default;
             }
         }
         void countRows()
