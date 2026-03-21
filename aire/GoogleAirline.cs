@@ -28,16 +28,18 @@ namespace aire
             GFAirline.Show();
         }
 
-        public void searchformultigroupcitydata(string frm, string to, bool isTargetOnly, string nameProc)
+        public async Task searchformultigroupcitydata(string frm, string to, bool isTargetOnly, string nameProc)
         {
             d.dt.Rows.Clear();
 
             d.dt.Clear();
             d.dt.Columns.Clear();
             d.cmdd.Parameters.Clear();
-            d.cmdd.CommandType = CommandType.StoredProcedure;
-
-            d.cmdd.CommandText = "" + nameProc + "";
+            
+            try
+            {
+                d.cmdd.CommandType = CommandType.StoredProcedure;
+                d.cmdd.CommandText = "" + nameProc + "";
 
             //Get selected value of stops ddl
             string selectedStops = ddlStops.SelectedValue.ToString();
@@ -221,29 +223,151 @@ namespace aire
                 d.cmdd.Parameters.Add("@RedDiff", SqlDbType.Bit).Value = redDiff;
             }
 
-            d.cmdd.CommandTimeout = 0;
+            // Set a reasonable timeout (120 seconds = 2 minutes) for large database queries
+            d.cmdd.CommandTimeout = 120;
             d.cmdd.Connection = d.cn;
 
-            d.dt.Load(d.cmdd.ExecuteReader());
+            // Ensure connection is open
+            if (d.cn.State != System.Data.ConnectionState.Open)
+            {
+                try
+                {
+                    d.connecter();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to connect to database.\n\n" +
+                                  "Please check your internet connection and database settings.\n\n" +
+                                  $"Error: {ex.Message}", 
+                                  "Database Connection Error", 
+                                  MessageBoxButtons.OK, 
+                                  MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            try
+            {
+                // Run database query asynchronously to prevent UI blocking
+                DataTable tempTable = new DataTable();
+                await Task.Run(() =>
+                {
+                    using (SqlDataReader reader = d.cmdd.ExecuteReader())
+                    {
+                        tempTable.Load(reader);
+                    }
+                });
+                
+                // Update the main DataTable on UI thread
+                d.dt = tempTable;
+            }
+            catch (SqlException ex)
+            {
+                // Check if it's a timeout error
+                if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+                {
+                    MessageBox.Show($"Search timed out after 2 minutes.\n\n" +
+                                  "The database query is taking too long. This could be due to:\n" +
+                                  "1. Large amount of data matching your criteria\n" +
+                                  "2. Slow internet connection\n" +
+                                  "3. Database server load\n\n" +
+                                  "Please try narrowing your search criteria (add FROM/TO locations, dates, etc.)", 
+                                  "Search Timeout", 
+                                  MessageBoxButtons.OK, 
+                                  MessageBoxIcon.Warning);
+                }
+                // Stored procedure doesn't exist
+                else if (ex.Message.Contains("Could not find stored procedure"))
+                {
+                    MessageBox.Show($"Stored procedure '{nameProc}' not found in database.\n\n" +
+                                  "Please run 'CreatePlaceholderStoredProcedures.sql' to create placeholder procedures,\n" +
+                                  "or restore your database from a backup.\n\n" +
+                                  $"Error: {ex.Message}", 
+                                  "Missing Stored Procedure", 
+                                  MessageBoxButtons.OK, 
+                                  MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show($"Database error during search:\n\n{ex.Message}\n\n" +
+                                  "SQL Error Number: {ex.Number}", 
+                                  "Database Error", 
+                                  MessageBoxButtons.OK, 
+                                  MessageBoxIcon.Error);
+                }
+                return; // Exit early - don't crash the app
+            }
+            catch (Exception ex)
+            {
+                // Catch any other exceptions to prevent app crash
+                string errorMsg = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMsg += "\n\nInner Error: " + ex.InnerException.Message;
+                }
+                
+                MessageBox.Show($"Error executing search:\n\n{errorMsg}\n\n" +
+                              "The application will continue running. Please try a different search.", 
+                              "Search Error", 
+                              MessageBoxButtons.OK, 
+                              MessageBoxIcon.Error);
+                return; // Exit early - don't crash the app
+            }
 
             cnt = d.dt.Rows.Count;
             if (cnt == 0)
             {
                 MessageBox.Show("The information entered is not on the database!");
             }
+            
+            // Check if new categorization columns exist in the result set
+            bool hasIsOldTarget = d.dt.Columns.Contains("IsOldTarget");
+            bool hasIsMonthTarget = d.dt.Columns.Contains("IsMonthTarget");
+            bool hasTargetDeal = d.dt.Columns.Contains("TargetDeal");
+            
             for (int i = 0; i < cnt; i++)
             {
                 bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][16].ToString()) : 0, !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][17].ToString()) : double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][16].ToString()) : 0, !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][17].ToString()) : double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
-                if (IsTargetFound.HasValue && IsTargetFound.Value)
+                // Apply color based on target categorization (priority: Green > Purple > Yellow > Blue)
+                bool isOldTarget = false;
+                bool isMonthTarget = false;
+                bool targetDeal = false;
+                
+                if (hasTargetDeal && d.dt.Rows[i]["TargetDeal"] != DBNull.Value)
+                    bool.TryParse(d.dt.Rows[i]["TargetDeal"].ToString(), out targetDeal);
+                if (hasIsMonthTarget && d.dt.Rows[i]["IsMonthTarget"] != DBNull.Value)
+                    bool.TryParse(d.dt.Rows[i]["IsMonthTarget"].ToString(), out isMonthTarget);
+                if (hasIsOldTarget && d.dt.Rows[i]["IsOldTarget"] != DBNull.Value)
+                    bool.TryParse(d.dt.Rows[i]["IsOldTarget"].ToString(), out isOldTarget);
+                
+                // Apply color with priority: Green > Purple > Yellow > Blue
+                if (targetDeal)
+                {
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                }
+                else if (isMonthTarget)
+                {
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.MediumPurple;
+                }
+                else if (isOldTarget)
+                {
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                }
+                else if (IsTargetFound.HasValue && IsTargetFound.Value)
                 {
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
                 }
             }
-
+            }
+            catch (Exception ex)
+            {
+                // Handle any other errors
+                MessageBox.Show($"Error executing search: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
 
@@ -261,41 +385,76 @@ namespace aire
             {
                 await Task.Run(() =>
                 {
-
-                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    if (dataGridView1.InvokeRequired)
                     {
-
-                        if (Convert.ToDouble(row.Cells[8].Value) < 0)
+                        dataGridView1.Invoke(new Action(() =>
+                        {
+                            ApplyDatagridColors();
+                        }));
+                    }
+                    else
+                    {
+                        ApplyDatagridColors();
+                    }
+                });
+            }
+            catch { }
+        }
+        
+        private void ApplyDatagridColors()
+        {
+            try
+            {
+                // Color the Difference column (cell 8) based on value
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    if (row.IsNewRow) continue;
+                    
+                    if (row.Cells[8].Value != null)
+                    {
+                        double diffValue = Convert.ToDouble(row.Cells[8].Value);
+                        
+                        if (diffValue < 0)
                         {
                             row.Cells[8].Style.BackColor = Color.LightGreen;
                         }
-                        else if (Convert.ToDouble(row.Cells[8].Value) > 0)
+                        else if (diffValue > 0)
                         {
                             row.Cells[8].Style.BackColor = Color.Red;
                         }
-                        if (Convert.ToDouble(row.Cells[8].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
+                        if (diffValue == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
                         {
                             row.Cells[8].Style.BackColor = Color.Orange;
                         }
-                        if (Convert.ToDouble(row.Cells[8].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
+                        if (diffValue == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
                         {
                             row.Cells[8].Style.BackColor = Color.Gray;
-
                         }
                     }
-                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                }
+                
+                // Color the FROM column (cell 1) if it matches hotel data
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    if (row.IsNewRow) continue;
+                    
+                    if (row.Cells[1].Value != null)
                     {
                         for (int i = 0; i < dthtl.Rows.Count; i++)
                         {
                             if (Convert.ToString(row.Cells[1].Value).Equals(dthtl.Rows[i][0].ToString()))
                             {
                                 row.Cells[1].Style.BackColor = Color.YellowGreen;
+                                break;
                             }
                         }
                     }
-                });
+                }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in ApplyDatagridColors: {ex.Message}");
+            }
         }
 
         string cbnB1, cbnB2, cbnB3, cbnB4;
@@ -397,9 +556,31 @@ namespace aire
             d.cmdd.Parameters.Add("@Fromdate", SqlDbType.Date).Value = fromdate;
             d.cmdd.Parameters.Add("@Todate", SqlDbType.Date).Value = todate;
             d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+            d.cmdd.CommandTimeout = 120; // 2 minute timeout
             d.cmdd.Connection = d.cn;
 
-            d.dt.Load(d.cmdd.ExecuteReader());
+            try
+            {
+                d.dt.Load(d.cmdd.ExecuteReader());
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+                {
+                    MessageBox.Show("Search timed out after 2 minutes.\n\nPlease try narrowing your search criteria.", 
+                                  "Search Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show($"Database error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error executing search: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             cnt = d.dt.Rows.Count;
 
@@ -415,7 +596,7 @@ namespace aire
                 bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+                double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
                 if (IsTargetFound.HasValue && IsTargetFound.Value)
                 {
@@ -471,54 +652,69 @@ namespace aire
             datagridvColor();
         }
 
-        private void button13_Click(object sender, EventArgs e)
+        private async void button13_Click(object sender, EventArgs e)
         {
-            label6.Text = "";
-            dataGridView1.Visible = true;
-
-            dataGridView2.Visible = false;
-            dataGridView1.Rows.Clear();
-
-            cbnB1 = "serchFromToMultiGroupCityGOOGleAirlineEverywhere";
-            cbnB2 = "serchFromMultiGroupCityGOOGleAirlineEverywhere";
-            cbnB3 = "serchToMultiGroupCityGOOGleAirlineEverywhere";
-            cbnB4 = "serchWithoutFromToGOOGleAirline";
-            string frm = textBox5.Text;
-            string to = textBox6.Text;
-            if (frm.ToLower() == "everywhere")
+            // Disable search button to prevent multiple clicks
+            button13.Enabled = false;
+            string originalButtonText = button13.Text;
+            button13.Text = "Searching...";
+            
+            // Force UI update
+            button13.Refresh();
+            Application.DoEvents();
+            
+            try
             {
-                frm = string.Empty;
+                label6.Text = "";
+                dataGridView1.Visible = true;
+
+                dataGridView2.Visible = false;
+                dataGridView1.Rows.Clear();
+
+                cbnB1 = "serchFromToMultiGroupCityGOOGleAirlineEverywhere";
+                cbnB2 = "serchFromMultiGroupCityGOOGleAirlineEverywhere";
+                cbnB3 = "serchToMultiGroupCityGOOGleAirlineEverywhere";
+                cbnB4 = "serchWithoutFromToGOOGleAirline";
+                string frm = textBox5.Text;
+                string to = textBox6.Text;
+                if (frm.ToLower() == "everywhere")
+                {
+                    frm = string.Empty;
+                }
+                if (to.ToLower() == "everywhere")
+                {
+                    to = string.Empty;
+                }
+                if (frm != "" && to != "")
+                {
+                    await searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB1);
+                    datagridvColor();
+                }
+                else if (frm != "" && to == "")
+                {
+                    await searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB2);
+                    datagridvColor();
+                }
+                else if (frm == "" && to != "")
+                {
+                    await searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB3);
+                    datagridvColor();
+                }
+                else if(frm == "" && to == "")
+                {
+                    await searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB4);
+                    datagridvColor();
+                }
             }
-            if (to.ToLower() == "everywhere")
+            catch (Exception ex)
             {
-                to = string.Empty;
+                MessageBox.Show($"Error during search: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            if (frm != "" && to != "")
+            finally
             {
-
-                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB1);
-
-                datagridvColor();
-            }
-            else if (frm != "" && to == "")
-            {
-
-                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB2);
-
-                datagridvColor();
-            }
-            else if (frm == "" && to != "")
-            {
-
-                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB3);
-
-                datagridvColor();
-            }
-            else if(frm == "" && to == "")
-            {
-                searchformultigroupcitydata(frm, to, chkTarget.Checked, cbnB4);
-
-                datagridvColor();
+                // Re-enable button and restore original text
+                button13.Enabled = true;
+                button13.Text = originalButtonText;
             }
         }
 
@@ -582,9 +778,31 @@ namespace aire
                 d.cmdd.Parameters.Add("@price2", SqlDbType.Float).Value = b;
             }
             d.cmdd.Parameters.Add("@isTargetOnly", SqlDbType.Bit).Value = isTargetOnly;
+            d.cmdd.CommandTimeout = 120; // 2 minute timeout
             d.cmdd.Connection = d.cn;
 
-            d.dt.Load(d.cmdd.ExecuteReader());
+            try
+            {
+                d.dt.Load(d.cmdd.ExecuteReader());
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+                {
+                    MessageBox.Show("Search timed out after 2 minutes.\n\nPlease try narrowing your search criteria.", 
+                                  "Search Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show($"Database error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error executing search: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             cnt = d.dt.Rows.Count;
 
@@ -598,7 +816,7 @@ namespace aire
                     bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
 
                     int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
-                    double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][16].ToString()), double.Parse(d.dt.Rows[i][17].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString());
+                    double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][16].ToString()), double.Parse(d.dt.Rows[i][17].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
                     if (IsTargetFound.HasValue && IsTargetFound.Value)
                     {

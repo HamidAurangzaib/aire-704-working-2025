@@ -7,7 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using Z.Dapper.Plus;
 using ExcelDataReader;
-using Microsoft.Office.Core;
+using System.Threading;
 
 
 namespace aire
@@ -61,22 +61,42 @@ namespace aire
                 MessageBox.Show("Please select an option from Name Dropdown.");
                 return;
             }
-            radioButton1.Enabled = false;
-            radioButton2.Enabled = true;
-            label1.Text = label5.Text;
-            label5.Text = "";
-            label3.Text = label4.Text;
-            label4.Text = "";
-			string ddlValue = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
-			d.cmdd.Parameters.Clear(); // Clear existing parameters
-			d.cmdd.CommandType = CommandType.StoredProcedure;
-			d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
-			d.cmdd.Connection = d.cn;
-			d.cmdd.CommandText = cbn2;
-			d.cmdd.CommandTimeout = 0;
-			d.cmdd.ExecuteNonQuery();
-            countRows();
-            button3.Visible = false;
+            
+            try
+            {
+                radioButton1.Enabled = false;
+                radioButton2.Enabled = true;
+                label1.Text = label5.Text;
+                label5.Text = "";
+                label3.Text = label4.Text;
+                label4.Text = "";
+                string ddlValue = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
+                d.cmdd.Parameters.Clear(); // Clear existing parameters
+                d.cmdd.CommandType = CommandType.StoredProcedure;
+                d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
+                d.cmdd.Connection = d.cn;
+                d.cmdd.CommandText = cbn2;
+                d.cmdd.CommandTimeout = 600; // 10 minutes for data insertion
+                d.cmdd.ExecuteNonQuery();
+                countRows();
+                button3.Visible = false;
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+                {
+                    MessageBox.Show("Operation timed out after 10 minutes.\n\nPlease try again later.",
+                                  "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show("Database error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         DataTableCollection tables;
@@ -209,7 +229,7 @@ namespace aire
                         d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
                         d.cmdd.Connection = d.cn;
                         d.cmdd.CommandText = "CheapestGAirline";
-                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.CommandTimeout = 600; // 10 minutes for data processing
                         d.cmdd.ExecuteNonQuery();
 
                     }
@@ -228,13 +248,13 @@ namespace aire
                         d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
                         d.cmdd.Connection = d.cn;
                         d.cmdd.CommandText = dltname;
-                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.CommandTimeout = 600; // 10 minutes for data processing
                         d.cmdd.ExecuteNonQuery();
                         d.cmdd.CommandText = cbn4;
-                        d.cmdd.CommandTimeout = 0; //in seconds
+                        d.cmdd.CommandTimeout = 600; // 10 minutes for data processing
                         d.cmdd.ExecuteNonQuery();
                         d.cmdd.CommandText = "delete0and0GFAirline";
-                        d.cmdd.CommandTimeout = 0;
+                        d.cmdd.CommandTimeout = 600; // 10 minutes for data processing
                         d.cmdd.ExecuteNonQuery();
 
                     }
@@ -457,7 +477,7 @@ namespace aire
                    
                     string Query = $"TRUNCATE TABLE  comprGOOGLAirline ";
                     SqlCommand cmd12 = new SqlCommand(Query, connNew);
-                cmd12.CommandTimeout = 0;
+                cmd12.CommandTimeout = 120; // 2 minutes for truncate operation
                     cmd12.ExecuteNonQuery();
 
 
@@ -567,31 +587,50 @@ namespace aire
                 return;
             }
 
-            string Name = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
+            try
+            {
+                string Name = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
 
-            d.cmdd.Parameters.Clear(); // Clear existing parameters
-            d.cmdd.CommandType = CommandType.StoredProcedure;
-            // Add the @Name parameter to the SqlCommand
-            d.cmdd.Parameters.AddWithValue("@Name", Name);
-            // Set the SqlConnection for the SqlCommand
-            d.cmdd.Connection = d.cn; // Assign the existing connection
-            // Set the stored procedure name as the command text
-            d.cmdd.CommandText = deleteOldFiles;
-            d.cmdd.CommandTimeout = 0;
-            d.cmdd.ExecuteNonQuery();
+                d.cmdd.Parameters.Clear(); // Clear existing parameters
+                d.cmdd.CommandType = CommandType.StoredProcedure;
+                // Add the @Name parameter to the SqlCommand
+                d.cmdd.Parameters.AddWithValue("@Name", Name);
+                // Set the SqlConnection for the SqlCommand
+                d.cmdd.Connection = d.cn; // Assign the existing connection
+                // Set the stored procedure name as the command text
+                d.cmdd.CommandText = deleteOldFiles;
+                d.cmdd.CommandTimeout = 300; // 5 minutes for delete operation
+                d.cmdd.ExecuteNonQuery();
 
 
 
-            d2.cmdd.CommandText = "delete from comprGOOGLAirline where name='";
+                d2.cmdd.CommandText = "delete from comprGOOGLAirline where name='";
 
-            //d.cmdd = new SqlCommand("EXEC " + deleteOldFiles + "", d.cn);
-            //d.cmdd.CommandTimeout = 0;
-            //d.cmdd.ExecuteNonQuery();
+                //d.cmdd = new SqlCommand("EXEC " + deleteOldFiles + "", d.cn);
+                //d.cmdd.CommandTimeout = 300;
+                //d.cmdd.ExecuteNonQuery();
 
-            label1.Text = "";
-            label3.Text = "";
-            countRows();
-            MessageBox.Show("Finish!!!!");
+                label1.Text = "";
+                label3.Text = "";
+                countRows();
+                MessageBox.Show("Finish!!!!");
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+                {
+                    MessageBox.Show("Delete operation timed out after 5 minutes.\n\nPlease try again later.",
+                                  "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show("Database error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -602,27 +641,46 @@ namespace aire
                 return;
             }
 
-			string Name = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
+            try
+            {
+                string Name = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
 
-			d.cmdd.Parameters.Clear(); // Clear existing parameters
+                d.cmdd.Parameters.Clear(); // Clear existing parameters
 
-			d.cmdd.CommandType = CommandType.StoredProcedure;
-            // Add the @Name parameter to the SqlCommand
-            d.cmdd.Parameters.AddWithValue("@Name", Name);
-            // Set the SqlConnection for the SqlCommand
-            d.cmdd.Connection = d.cn; // Assign the existing connection
-            // Set the stored procedure name as the command text
-            d.cmdd.CommandText = deleteNewFiles;
-            d.cmdd.CommandTimeout = 0;
-            d.cmdd.ExecuteNonQuery();
+                d.cmdd.CommandType = CommandType.StoredProcedure;
+                // Add the @Name parameter to the SqlCommand
+                d.cmdd.Parameters.AddWithValue("@Name", Name);
+                // Set the SqlConnection for the SqlCommand
+                d.cmdd.Connection = d.cn; // Assign the existing connection
+                // Set the stored procedure name as the command text
+                d.cmdd.CommandText = deleteNewFiles;
+                d.cmdd.CommandTimeout = 300; // 5 minutes for delete operation
+                d.cmdd.ExecuteNonQuery();
 
-            label5.Text = "";
-            label4.Text = "";
-            countRows();
-            MessageBox.Show("Finish!!!!");
+                label5.Text = "";
+                label4.Text = "";
+                countRows();
+                MessageBox.Show("Finish!!!!");
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+                {
+                    MessageBox.Show("Delete operation timed out after 5 minutes.\n\nPlease try again later.",
+                                  "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show("Database error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private async void button4_Click(object sender, EventArgs e)
         {
 			if (ddlName.SelectedIndex == 0)
 			{
@@ -630,68 +688,167 @@ namespace aire
 				return;
 			}
 
-			string ddlValue = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
+			// Disable button to prevent multiple clicks
+			button4.Enabled = false;
+			string originalButtonText = button4.Text;
+			button4.Text = "Processing...";
+			
+			try
+			{
+				string ddlValue = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
                 
-                exe1 = "modifAirline";
-                exe2 = "deleteOldDateIngoogleAirlinech";
-                exe4 = "doblerowschAirline";
-
-                exe6 = "cmprGAirline";
-                exe7 = "doblerowsAirline";
+				exe1 = "modifAirline";
+				exe2 = "deleteOldDateIngoogleAirlinech";
+				exe4 = "doblerowschAirline";
+				exe6 = "cmprGAirline";
+				exe7 = "doblerowsAirline";
        
+				if (textBox1.Text != "")
+				{
+					// Run database operations asynchronously to prevent UI blocking
+					await Task.Run(() =>
+					{
+						try
+						{
+							// Ensure connection is open
+							if (d.cn.State != System.Data.ConnectionState.Open)
+							{
+								d.connecter();
+							}
 
-            
-            if (textBox1.Text != "")
-            {
-                d.cmdd = new SqlCommand("exec " + exe1 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+							// Set 10 minute timeout for bulk data processing operations (600 seconds)
+							// These operations process thousands of rows and legitimately take time
+							int processingTimeout = 600;
 
+							d.cmdd = new SqlCommand("exec " + exe1 + "", d.cn);
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-                d.cmdd = new SqlCommand("exec " + exe4 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+							d.cmdd = new SqlCommand("exec " + exe4 + "", d.cn);
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-				d.cmdd.Parameters.Clear(); // Clear existing parameters
-				d.cmdd.CommandType = CommandType.StoredProcedure;
-				d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
-				d.cmdd.Connection = d.cn;
+							d.cmdd.Parameters.Clear();
+							d.cmdd.CommandType = CommandType.StoredProcedure;
+							d.cmdd.Parameters.AddWithValue("@Name", ddlValue);
+							d.cmdd.Connection = d.cn;
 
-				d.cmdd.CommandText = exe2;
-				d.cmdd.CommandTimeout = 0;
-				d.cmdd.ExecuteNonQuery();
+							d.cmdd.CommandText = exe2;
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-				d.cmdd.CommandText = exe6;
-				d.cmdd.CommandTimeout = 0;
-				d.cmdd.ExecuteNonQuery();
+							d.cmdd.CommandText = exe6;
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-                d.cmdd.CommandText = "updatecmprGAirline";
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+							d.cmdd.CommandText = "updatecmprGAirline";
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-                d.cmdd.Parameters.Clear(); // Clear existing parameters
-                d.cmdd.CommandType = CommandType.Text;
-                d.cmdd = new SqlCommand("exec " + exe7 + "", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+							d.cmdd.Parameters.Clear();
+							d.cmdd.CommandType = CommandType.Text;
+							d.cmdd = new SqlCommand("exec " + exe7 + "", d.cn);
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-                d.cmdd = new SqlCommand("exec upd_cmprgoogleAirline", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+							d.cmdd = new SqlCommand("exec upd_cmprgoogleAirline", d.cn);
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
 
-                d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
-                d.cmdd.CommandTimeout = 0; //in seconds
-                d.cmdd.ExecuteNonQuery();
+							d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
+							d.cmdd.CommandTimeout = processingTimeout;
+							d.cmdd.ExecuteNonQuery();
+						}
+						catch (SqlException ex)
+						{
+							this.Invoke((MethodInvoker)delegate
+							{
+								if (ex.Number == -2 || ex.Message.Contains("Timeout") || ex.Message.Contains("timeout"))
+								{
+									MessageBox.Show("Processing timed out after 10 minutes.\n\n" +
+												  "The data processing is taking too long. This could be due to:\n" +
+												  "1. Very large dataset (5000+ rows)\n" +
+												  "2. Slow internet connection\n" +
+												  "3. Database server load\n\n" +
+												  "Please try again later or contact support if the problem persists.",
+												  "Processing Timeout",
+												  MessageBoxButtons.OK,
+												  MessageBoxIcon.Warning);
+								}
+								else
+								{
+									MessageBox.Show("Database error during processing:\n\n" + ex.Message + "\n\n" +
+												  "SQL Error Number: " + ex.Number,
+												  "Database Error",
+												  MessageBoxButtons.OK,
+												  MessageBoxIcon.Error);
+								}
+							});
+							throw;
+						}
+						catch (Exception ex)
+						{
+							this.Invoke((MethodInvoker)delegate
+							{
+								MessageBox.Show("Error during database operations: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+							});
+							throw;
+						}
+					});
 
-                dt = null;
-                d.dt = null;
-                MessageBox.Show("finish");
+                // NEW: Calculate Target Categorizations (IsOldTarget, IsMonthTarget, TargetDeal)
+                // Run asynchronously to prevent UI blocking
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        ClassTargetCategorization.CalculateAllTargetCategories(d.cn, ddlValue);
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            MessageBox.Show("Target categorization completed successfully!");
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            MessageBox.Show("Target categorization error: " + ex.Message);
+                        });
+                    }
+					});
 
-            }
+					dt = null;
+					d.dt = null;
+					
+					MessageBox.Show("Finish! Data processing completed. Target categorization is running in the background.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				}
 
-            d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
-            d.cmdd.CommandTimeout = 0; //in seconds
-            d.cmdd.ExecuteNonQuery();
+				// Execute cleanup procedure if it exists (optional)
+				try
+				{
+					if (d.cn.State == System.Data.ConnectionState.Open)
+					{
+						d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
+						d.cmdd.CommandTimeout = 300; // 5 minutes for cleanup
+						d.cmdd.ExecuteNonQuery();
+					}
+				}
+				catch (SqlException ex)
+				{
+					// Stored procedure doesn't exist or timed out - this is OK for cleanup
+					System.Diagnostics.Debug.WriteLine("dlltGF0 cleanup error: " + ex.Message);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+			finally
+			{
+				// Re-enable button
+				button4.Enabled = true;
+				button4.Text = "Finish";
+			}
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)

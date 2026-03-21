@@ -51,11 +51,29 @@ namespace aire
         {
             UploadImage.Hide();
             d.connecter();
-            d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
-            d.cmdd.ExecuteNonQuery();
+            
+            // Execute cleanup procedures if they exist (optional)
+            try
+            {
+                d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
+                d.cmdd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                // Stored procedure doesn't exist - this is OK for new/local databases
+                System.Diagnostics.Debug.WriteLine("dlltGF0 stored procedure not found: " + ex.Message);
+            }
 
-            d.cmdd = new SqlCommand("exec dlltitx0", d.cn);
-            d.cmdd.ExecuteNonQuery();
+            try
+            {
+                d.cmdd = new SqlCommand("exec dlltitx0", d.cn);
+                d.cmdd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                // Stored procedure doesn't exist - this is OK for new/local databases
+                System.Diagnostics.Debug.WriteLine("dlltitx0 stored procedure not found: " + ex.Message);
+            }
         }
 
         private void button1_Click_1(object sender, EventArgs e)

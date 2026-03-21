@@ -472,8 +472,17 @@ namespace aire
 
             }
 
-            d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
-            d.cmdd.ExecuteNonQuery();
+            // Execute cleanup procedure if it exists (optional)
+            try
+            {
+                d.cmdd = new SqlCommand("exec dlltGF0", d.cn);
+                d.cmdd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                // Stored procedure doesn't exist - this is OK for new/local databases
+                System.Diagnostics.Debug.WriteLine("dlltGF0 stored procedure not found: " + ex.Message);
+            }
           
         }
 
