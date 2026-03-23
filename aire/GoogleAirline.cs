@@ -367,8 +367,7 @@ namespace aire
                 else if (IsTargetFound.HasValue && IsTargetFound.Value)
                 {
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                else if (IsOldTarget.HasValue && IsOldTarget.Value)
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                }
             }
             }
             catch (Exception ex)
