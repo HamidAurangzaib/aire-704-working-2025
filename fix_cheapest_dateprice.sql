@@ -40,18 +40,19 @@ GO
 -- MinPrice = MIN(Olde_price, New_price) per row
 -- DatePriceLastChanged = existing DateNewPriceChanged or NewUploadDate
 -- ============================================================
+-- Uses GROUP BY + MIN to handle duplicate rows in comprGOOGLAirline
 INSERT INTO dbo.comprGOOGLAirline_PriceHistory
     ([From],[To],Aircode,Cabin,[Days],Stops,Dates,MinPrice,DatePriceLastChanged)
 SELECT
     c.[From], c.[To], c.Aircode, c.Cabin, c.[Days], c.Stops, c.Dates,
-    CASE
+    MIN(CASE
         WHEN c.Olde_price > 0 AND c.New_price > 0
             THEN CASE WHEN c.Olde_price < c.New_price THEN c.Olde_price ELSE c.New_price END
         WHEN c.New_price  > 0 THEN c.New_price
         WHEN c.Olde_price > 0 THEN c.Olde_price
         ELSE 0
-    END,
-    ISNULL(c.DateNewPriceChanged, c.NewUploadDate)
+    END),
+    MIN(ISNULL(c.DateNewPriceChanged, c.NewUploadDate))
 FROM dbo.comprGOOGLAirline c
 WHERE (c.New_price > 0 OR c.Olde_price > 0)
   AND NOT EXISTS (
@@ -60,7 +61,8 @@ WHERE (c.New_price > 0 OR c.Olde_price > 0)
         AND h.Aircode  = c.Aircode  AND h.Cabin    = c.Cabin
         AND h.[Days]   = c.[Days]   AND h.Stops    = c.Stops
         AND h.Dates    = c.Dates
-  );
+  )
+GROUP BY c.[From], c.[To], c.Aircode, c.Cabin, c.[Days], c.Stops, c.Dates;
 
 PRINT 'Seeded ' + CAST(@@ROWCOUNT AS VARCHAR) + ' rows into history table';
 
