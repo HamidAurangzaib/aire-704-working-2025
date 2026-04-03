@@ -796,26 +796,6 @@ namespace aire
 						}
 					});
 
-                // NEW: Calculate Target Categorizations (IsOldTarget, IsMonthTarget, TargetDeal)
-                // Run asynchronously to prevent UI blocking
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        ClassTargetCategorization.CalculateAllTargetCategories(d.cn, ddlValue);
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            MessageBox.Show("Target categorization completed successfully!");
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            MessageBox.Show("Target categorization error: " + ex.Message);
-                        });
-                    }
-					});
 
 					dt = null;
 					d.dt = null;
