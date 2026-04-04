@@ -323,8 +323,8 @@ namespace aire
             // Check if new categorization columns exist in the result set
             bool hasIsOldTarget = d.dt.Columns.Contains("IsOldTarget");
             bool hasIsMonthTarget = d.dt.Columns.Contains("IsMonthTarget");
-            bool hasTargetDeal = d.dt.Columns.Contains("TargetDeal");
-            
+            bool hasTargetDeal = d.dt.Columns.Contains("IsTargetDeal");
+
             for (int i = 0; i < cnt; i++)
             {
                 bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
@@ -343,9 +343,9 @@ namespace aire
                 bool isOldTarget = false;
                 bool isMonthTarget = false;
                 bool targetDeal = false;
-                
-                if (hasTargetDeal && d.dt.Rows[i]["TargetDeal"] != DBNull.Value)
-                    bool.TryParse(d.dt.Rows[i]["TargetDeal"].ToString(), out targetDeal);
+
+                if (hasTargetDeal && d.dt.Rows[i]["IsTargetDeal"] != DBNull.Value)
+                    bool.TryParse(d.dt.Rows[i]["IsTargetDeal"].ToString(), out targetDeal);
                 if (hasIsMonthTarget && d.dt.Rows[i]["IsMonthTarget"] != DBNull.Value)
                     bool.TryParse(d.dt.Rows[i]["IsMonthTarget"].ToString(), out isMonthTarget);
                 if (hasIsOldTarget && d.dt.Rows[i]["IsOldTarget"] != DBNull.Value)
