@@ -526,6 +526,16 @@ namespace aire
                                     line.OtaDiscount = double.Parse(reader["OtaDiscount"].ToString());
                                     line.OtaTotal = double.Parse(reader["OtaTotal"].ToString());
 
+                                    // Read the 4 new columns
+                                    if (!reader.IsDBNull(reader.GetOrdinal("DateNewPriceChanged")))
+                                        line.DateNewPriceChanged = reader.GetDateTime(reader.GetOrdinal("DateNewPriceChanged"));
+                                    if (!reader.IsDBNull(reader.GetOrdinal("IsOldTarget")))
+                                        line.IsOldTarget = reader.GetBoolean(reader.GetOrdinal("IsOldTarget"));
+                                    if (!reader.IsDBNull(reader.GetOrdinal("IsMonthTarget")))
+                                        line.IsMonthTarget = reader.GetBoolean(reader.GetOrdinal("IsMonthTarget"));
+                                    if (!reader.IsDBNull(reader.GetOrdinal("IsTargetDeal")))
+                                        line.IsTargetDeal = reader.GetBoolean(reader.GetOrdinal("IsTargetDeal"));
+
                                     Dataset.Add(line);
 
 
