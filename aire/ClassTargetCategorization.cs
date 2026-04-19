@@ -43,9 +43,10 @@ namespace aire
         /// Logic: If blue (IsTargetFound=1) and yellow (IsOldTarget=1) records exist with:
         /// - Same From, To, Airline, Stops, Cabin
         /// - Different months
-        /// AND no Olde_price in the same month is cheaper than the blue row's New_price
+        /// AND no price (Olde_price OR New_price) in the same month is cheaper than the blue row's New_price
         /// Then the blue records become purple (IsMonthTarget=1)
-        /// If a cheaper Olde_price exists in the same month, the blue row stays IsTargetFound only
+        /// If a cheaper price exists in the same month (including RED records or new-only records with Old=0),
+        /// the blue row stays IsTargetFound only.
         /// </summary>
         public static void CalculateIsMonthTarget(SqlConnection connection, string name)
         {
@@ -56,7 +57,10 @@ namespace aire
                 WHERE Name = @Name;
 
                 -- Set IsMonthTarget for blue records with different months than yellows,
-                -- but only if no Olde_price cheaper than this row's New_price exists in the same month
+                -- but only if no price (Olde_price OR New_price) cheaper than this row's New_price
+                -- exists in the same month. This covers:
+                --   1) RED records (Difference > 0) where New_price is still cheaper
+                --   2) New-only records (Olde_price=0) where New_price is cheaper
                 UPDATE blue
                 SET blue.IsMonthTarget = 1
                 FROM comprGOOGLAirline blue
@@ -87,8 +91,10 @@ namespace aire
                             AND blue.Cabin   = sm.Cabin
                             AND MONTH(sm.Dates) = MONTH(blue.Dates)
                             AND YEAR(sm.Dates)  = YEAR(blue.Dates)
-                            AND sm.Olde_price   > 0
-                            AND sm.Olde_price   < blue.New_price
+                            AND (
+                                (sm.Olde_price > 0 AND sm.Olde_price < blue.New_price)
+                                OR (sm.New_price > 0 AND sm.New_price < blue.New_price)
+                            )
                     )";
 
             using (SqlCommand cmd = new SqlCommand(query, connection))
@@ -110,14 +116,14 @@ namespace aire
         public static void CalculateTargetDeal(SqlConnection connection, string name)
         {
             string query = @"
-                -- Reset TargetDeal
+                -- Reset IsTargetDeal
                 UPDATE comprGOOGLAirline
-                SET TargetDeal = 0
+                SET IsTargetDeal = 0
                 WHERE Name = @Name;
 
-                -- Set TargetDeal for blue records that are cheaper than yellow, purple, and other blue records
+                -- Set IsTargetDeal for blue records that are cheaper than yellow, purple, and other blue records
                 UPDATE blue
-                SET blue.TargetDeal = 1
+                SET blue.IsTargetDeal = 1
                 FROM comprGOOGLAirline blue
                 WHERE blue.Name = @Name
                     AND blue.IsTargetFound = 1
@@ -196,7 +202,7 @@ namespace aire
                         SELECT 1
                         FROM comprGOOGLAirline green
                         WHERE green.Name = @Name
-                            AND green.TargetDeal = 1
+                            AND green.IsTargetDeal = 1
                             AND blue.[From]   = green.[From]
                             AND blue.[To]     = green.[To]
                             AND blue.Airline  = green.Airline
@@ -204,6 +210,68 @@ namespace aire
                             AND blue.Cabin    = green.Cabin
                             AND MONTH(blue.Dates) = MONTH(green.Dates)
                             AND YEAR(blue.Dates)  = YEAR(green.Dates)
+                    )";
+
+            using (SqlCommand cmd = new SqlCommand(query, connection))
+            {
+                cmd.CommandTimeout = 0;
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Categorizes records as IsTargetDealOld (Orange)
+        /// Logic: Records that are currently IsOldTarget (Yellow) but were IsTargetDeal (Green)
+        /// on a previous upload date for the same route/date/airline/stops/cabin/aircode,
+        /// AND are still the cheapest — i.e. no other record has a lower New_price for the same route.
+        /// This persists upload-to-upload until the price changes (which moves it back to blue or red).
+        /// </summary>
+        public static void CalculateIsTargetDealOld(SqlConnection connection, string name)
+        {
+            string query = @"
+                -- Reset IsTargetDealOld
+                UPDATE comprGOOGLAirline
+                SET IsTargetDealOld = 0
+                WHERE Name = @Name;
+
+                -- Set IsTargetDealOld: was Green on a prior upload, price unchanged (IsOldTarget=1),
+                -- and still the cheapest for this route
+                UPDATE curr
+                SET curr.IsTargetDealOld = 1
+                FROM comprGOOGLAirline curr
+                WHERE curr.Name = @Name
+                    AND curr.IsOldTarget = 1
+                    AND curr.New_price > 0
+                    -- Was previously IsTargetDeal (Green) for same route + flight date
+                    AND EXISTS (
+                        SELECT 1
+                        FROM comprGOOGLAirline prev
+                        WHERE prev.Name         = @Name
+                            AND prev.IsTargetDeal  = 1
+                            AND prev.[From]        = curr.[From]
+                            AND prev.[To]          = curr.[To]
+                            AND prev.Airline       = curr.Airline
+                            AND prev.Stops         = curr.Stops
+                            AND prev.Cabin         = curr.Cabin
+                            AND prev.Aircode       = curr.Aircode
+                            AND prev.Dates         = curr.Dates
+                            AND prev.NewUploadDate < curr.NewUploadDate
+                    )
+                    -- Still the cheapest: no other record for same route has a lower New_price
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM comprGOOGLAirline cheaper
+                        WHERE cheaper.Name      = @Name
+                            AND cheaper.[From]  = curr.[From]
+                            AND cheaper.[To]    = curr.[To]
+                            AND cheaper.Airline = curr.Airline
+                            AND cheaper.Stops   = curr.Stops
+                            AND cheaper.Cabin   = curr.Cabin
+                            AND cheaper.Aircode = curr.Aircode
+                            AND cheaper.New_price > 0
+                            AND cheaper.New_price < curr.New_price
+                            AND cheaper.id <> curr.id
                     )";
 
             using (SqlCommand cmd = new SqlCommand(query, connection))
@@ -225,12 +293,15 @@ namespace aire
             // Step 2: Calculate IsMonthTarget (Purple)
             CalculateIsMonthTarget(connection, name);
 
-            // Step 3: Calculate TargetDeal (Green)
+            // Step 3: Calculate IsTargetDeal (Green)
             CalculateTargetDeal(connection, name);
 
-            // Step 4: Remove purple from months that already have a TargetDeal (Green).
-            //         Those rows revert to IsTargetFound (Blue) — the TargetDeal is the cheapest.
+            // Step 4: Remove purple from months that already have a IsTargetDeal (Green).
+            //         Those rows revert to IsTargetFound (Blue) — the IsTargetDeal is the cheapest.
             ResetMonthTargetWhenTargetDealExists(connection, name);
+
+            // Step 5: Calculate IsTargetDealOld (Orange) — was Green, same price, still cheapest
+            CalculateIsTargetDealOld(connection, name);
         }
 
         /// <summary>
@@ -264,9 +335,10 @@ namespace aire
         /// <summary>
         /// Gets the category name based on flags
         /// </summary>
-        public static string GetCategoryName(bool isOldTarget, bool isMonthTarget, bool targetDeal, bool isTargetFound)
+        public static string GetCategoryName(bool isOldTarget, bool isMonthTarget, bool targetDeal, bool isTargetFound, bool isTargetDealOld = false)
         {
             if (targetDeal) return "TargetDeal (Green)";
+            if (isTargetDealOld) return "TargetDealOld (Orange)";
             if (isMonthTarget) return "MonthTarget (Purple)";
             if (isOldTarget) return "OldTarget (Yellow)";
             if (isTargetFound) return "Target (Blue)";
@@ -276,13 +348,14 @@ namespace aire
         /// <summary>
         /// Gets the appropriate color for a record based on its category
         /// </summary>
-        public static System.Drawing.Color GetCategoryColor(bool isOldTarget, bool isMonthTarget, bool targetDeal, bool isTargetFound)
+        public static System.Drawing.Color GetCategoryColor(bool isOldTarget, bool isMonthTarget, bool targetDeal, bool isTargetFound, bool isTargetDealOld = false)
         {
-            if (targetDeal) return System.Drawing.Color.LightGreen;  // Green for best deals
-            if (isMonthTarget) return System.Drawing.Color.MediumPurple;  // Purple for month targets
-            if (isOldTarget) return System.Drawing.Color.Yellow;  // Yellow for old targets
-            if (isTargetFound) return System.Drawing.Color.LightBlue;  // Blue for regular targets
-            return System.Drawing.Color.White;  // White for regular records
+            if (targetDeal) return System.Drawing.Color.LightGreen;       // Green: best deal
+            if (isTargetDealOld) return System.Drawing.Color.Orange;      // Orange: was Green, same price
+            if (isMonthTarget) return System.Drawing.Color.MediumPurple;  // Purple: month targets
+            if (isOldTarget) return System.Drawing.Color.Yellow;          // Yellow: old targets
+            if (isTargetFound) return System.Drawing.Color.LightBlue;     // Blue: regular targets
+            return System.Drawing.Color.White;
         }
     }
 }

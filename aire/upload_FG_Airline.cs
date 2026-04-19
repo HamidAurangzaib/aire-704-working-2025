@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -458,132 +458,82 @@ namespace aire
 			}
 		}
 
-        private void button8_Click(object sender, EventArgs e)
+        private async void button8_Click(object sender, EventArgs e)
         {
-            int y = 0;
-         
-                button8.Enabled = false;
-                int x = 0;
-                List<classGFAirlineNEW> Dataset = new List<classGFAirlineNEW>();
-                // Database connections
-                string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
-                string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
-                IDbConnection db2 = new SqlConnection(connNEWStr1);
-                using (SqlConnection connNew = new SqlConnection(connNEWStr1))
-                using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+            button8.Enabled = false;
+            label8.Text = "Starting transfer...";
+            label1.Text = "";
+
+            string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+            string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+
+            try
+            {
+                await Task.Run(() =>
                 {
-                    connNew.Open();
-                    connOLD.Open();
-                   
-                    string Query = $"TRUNCATE TABLE  comprGOOGLAirline ";
-                    SqlCommand cmd12 = new SqlCommand(Query, connNew);
-                cmd12.CommandTimeout = 120; // 2 minutes for truncate operation
-                    cmd12.ExecuteNonQuery();
-
-
-                Query = $"SELECT  count(*) FROM comprGOOGLAirline ";
-                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
-                var Count = cmd13.ExecuteScalar();
-
-                Query = $"SELECT  * FROM comprGOOGLAirline";
-
-
-
-                    if (int.Parse(Count.ToString()) > 0)
+                    using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+                    using (SqlConnection connNew = new SqlConnection(connNEWStr1))
                     {
-                     
-                        SqlCommand cOld = new SqlCommand(Query, connOLD);
+                        connOLD.Open();
+                        connNew.Open();
 
+                        long totalRows = 0;
+                        using (SqlCommand cmdCount = new SqlCommand("SELECT COUNT(*) FROM comprGOOGLAirline", connOLD))
+                            totalRows = (int)cmdCount.ExecuteScalar();
 
-
+                        if (totalRows == 0)
                         {
-
-                            using (SqlDataReader reader = cOld.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    classGFAirlineNEW line = new classGFAirlineNEW();
-                                    // Assuming you want to display some columns from the table, e.g., id and some other column
-                                    line.id = int.Parse(reader["id"].ToString());
-                                    line.oldid = int.Parse(reader["id"].ToString());
-                                    line.From = reader["From"].ToString();
-                                    line.To = reader["To"].ToString();
-                                    line.citys = reader["citys"].ToString();
-                                    line.Dates = DateTime.Parse(reader["Dates"].ToString());
-                                    line.Olde_price = double.Parse(reader["Olde_price"].ToString());
-                                    line.New_price = double.Parse(reader["New_price"].ToString());
-                                    line.Difference = double.Parse(reader["Difference"].ToString());
-                                    line.Cheapest = double.Parse(reader["Cheapest"].ToString());
-                                    line.Airline = reader["Airline"].ToString();
-                                    line.Aircode = reader["Aircode"].ToString();
-                                    line.Cabin = reader["Cabin"].ToString();
-                                    line.Days = reader["Days"].ToString();
-                                    line.Stops = reader["stops"].ToString();
-                                    line.web = reader["web"].ToString();
-                                    line.IsTargetFound = bool.Parse(reader["IsTargetFound"].ToString());
-                                    line.Name = reader["name"].ToString();
-                                    line.NewUploadDate = DateTime.Parse(reader["NewUploadDate"].ToString());
-                                    line.OtaDiscount = double.Parse(reader["OtaDiscount"].ToString());
-                                    line.OtaTotal = double.Parse(reader["OtaTotal"].ToString());
-
-                                    // Read the 4 new columns
-                                    if (!reader.IsDBNull(reader.GetOrdinal("DateNewPriceChanged")))
-                                        line.DateNewPriceChanged = reader.GetDateTime(reader.GetOrdinal("DateNewPriceChanged"));
-                                    if (!reader.IsDBNull(reader.GetOrdinal("IsOldTarget")))
-                                        line.IsOldTarget = reader.GetBoolean(reader.GetOrdinal("IsOldTarget"));
-                                    if (!reader.IsDBNull(reader.GetOrdinal("IsMonthTarget")))
-                                        line.IsMonthTarget = reader.GetBoolean(reader.GetOrdinal("IsMonthTarget"));
-                                    if (!reader.IsDBNull(reader.GetOrdinal("IsTargetDeal")))
-                                        line.IsTargetDeal = reader.GetBoolean(reader.GetOrdinal("IsTargetDeal"));
-
-                                    Dataset.Add(line);
-
-
-
-
-
-                                    x++;
-                                label8.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
-                                if (x % 5000 == 0)
-                                    {
-                                        db2.BulkInsert(Dataset);
-                                        Application.DoEvents();
-                                        Dataset.Clear();
-
-
-                                    }
-
-
-
-                                }
-
-
-
-                                if (Dataset.Count > 0)
-                                {  
-                                    db2.BulkInsert(Dataset);
-                                    Application.DoEvents();
-                                    Dataset.Clear();
-                                    label1.Text = "Done!";
-
-
-                                }
-
-
-                            }
-
+                            this.Invoke((MethodInvoker)(() => label8.Text = "No rows to transfer."));
+                            return;
                         }
 
+                        using (SqlCommand cmdTrunc = new SqlCommand("TRUNCATE TABLE comprGOOGLAirline", connNew))
+                        {
+                            cmdTrunc.CommandTimeout = 120;
+                            cmdTrunc.ExecuteNonQuery();
+                        }
 
+                        using (SqlCommand cmdSrc = new SqlCommand("SELECT * FROM comprGOOGLAirline", connOLD))
+                        {
+                            cmdSrc.CommandTimeout = 0;
+                            using (SqlDataReader reader = cmdSrc.ExecuteReader())
+                            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connNew))
+                            {
+                                bulkCopy.DestinationTableName = "comprGOOGLAirline";
+                                bulkCopy.BatchSize = 10000;
+                                bulkCopy.BulkCopyTimeout = 0;
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                    bulkCopy.ColumnMappings.Add(reader.GetName(i), reader.GetName(i));
+
+                                bulkCopy.NotifyAfter = 10000;
+                                long transferred = 0;
+                                bulkCopy.SqlRowsCopied += (s, ev) =>
+                                {
+                                    transferred = ev.RowsCopied;
+                                    this.Invoke((MethodInvoker)(() =>
+                                        label8.Text = "Transferring: " + transferred.ToString("N0") + " / " + totalRows.ToString("N0")));
+                                };
+
+                                bulkCopy.WriteToServer(reader);
+                            }
+                        }
                     }
-                }
-                // timer1.Enabled = true;
+                });
+
+                label8.Text = "Transfer complete!";
+                label1.Text = "Done!";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Transfer error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label8.Text = "Transfer failed.";
+            }
+            finally
+            {
                 button8.Enabled = true;
-            
-
-           
+            }
         }
-
         private void label7_Click(object sender, EventArgs e)
         {
 

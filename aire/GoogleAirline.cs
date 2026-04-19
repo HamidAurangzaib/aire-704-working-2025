@@ -324,6 +324,7 @@ namespace aire
             bool hasIsOldTarget = d.dt.Columns.Contains("IsOldTarget");
             bool hasIsMonthTarget = d.dt.Columns.Contains("IsMonthTarget");
             bool hasTargetDeal = d.dt.Columns.Contains("IsTargetDeal");
+            bool hasTargetDealOld = d.dt.Columns.Contains("IsTargetDealOld");
 
             for (int i = 0; i < cnt; i++)
             {
@@ -331,43 +332,42 @@ namespace aire
                 bool? IsOldTarget   = d.dt.Columns.Count > 20 ? d.dt.Rows[i][20] as bool? : null;
                 bool? IsMonthTarget = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
                 bool? IsTargetDeal  = d.dt.Columns.Count > 22 ? d.dt.Rows[i][22] as bool? : null;
+                bool? IsTargetDealOld = hasTargetDealOld && d.dt.Rows[i]["IsTargetDealOld"] != DBNull.Value
+                    ? (bool?)bool.Parse(d.dt.Rows[i]["IsTargetDealOld"].ToString()) : null;
 
-                if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                // Deals filter: show both Green (IsTargetDeal) and Orange (IsTargetDealOld)
+                if (radioTargetDeals.Checked  && !((IsTargetDeal.HasValue && IsTargetDeal.Value) || (IsTargetDealOld.HasValue && IsTargetDealOld.Value))) continue;
                 if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
                 if (double.Parse(d.dt.Rows[i][5].ToString()) == 0) continue; // skip rows with no current price
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                 double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][16].ToString()) : 0, !string.IsNullOrEmpty(d.dt.Rows[i][16].ToString()) ? double.Parse(d.dt.Rows[i][17].ToString()) : double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
-                // Apply color based on target categorization (priority: Green > Purple > Yellow > Blue)
+                // Apply color with priority: Green > Orange > Purple > Yellow > Blue
                 bool isOldTarget = false;
                 bool isMonthTarget = false;
                 bool targetDeal = false;
+                bool targetDealOld = false;
 
                 if (hasTargetDeal && d.dt.Rows[i]["IsTargetDeal"] != DBNull.Value)
                     bool.TryParse(d.dt.Rows[i]["IsTargetDeal"].ToString(), out targetDeal);
+                if (hasTargetDealOld && d.dt.Rows[i]["IsTargetDealOld"] != DBNull.Value)
+                    bool.TryParse(d.dt.Rows[i]["IsTargetDealOld"].ToString(), out targetDealOld);
                 if (hasIsMonthTarget && d.dt.Rows[i]["IsMonthTarget"] != DBNull.Value)
                     bool.TryParse(d.dt.Rows[i]["IsMonthTarget"].ToString(), out isMonthTarget);
                 if (hasIsOldTarget && d.dt.Rows[i]["IsOldTarget"] != DBNull.Value)
                     bool.TryParse(d.dt.Rows[i]["IsOldTarget"].ToString(), out isOldTarget);
-                
-                // Apply color with priority: Green > Purple > Yellow > Blue
+
                 if (targetDeal)
-                {
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
-                }
+                else if (targetDealOld)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Orange;
                 else if (isMonthTarget)
-                {
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.MediumPurple;
-                }
                 else if (isOldTarget)
-                {
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
-                }
                 else if (IsTargetFound.HasValue && IsTargetFound.Value)
-                {
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
-                }
             }
             }
             catch (Exception ex)
@@ -419,24 +419,20 @@ namespace aire
                     
                     if (row.Cells[8].Value != null)
                     {
-                        double diffValue = Convert.ToDouble(row.Cells[8].Value);
-                        
-                        if (diffValue < 0)
-                        {
-                            row.Cells[8].Style.BackColor = Color.LightGreen;
-                        }
-                        else if (diffValue > 0)
-                        {
-                            row.Cells[8].Style.BackColor = Color.Red;
-                        }
-                        if (diffValue == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
-                        {
-                            row.Cells[8].Style.BackColor = Color.Orange;
-                        }
-                        if (diffValue == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
-                        {
+                        double diffValue  = Convert.ToDouble(row.Cells[8].Value);
+                        double oldPrice   = Convert.ToDouble(row.Cells[4].Value);
+                        double newPrice   = Convert.ToDouble(row.Cells[5].Value);
+
+                        // New price (no previous): OLD=0, NEW>0 — always Grey regardless of diff
+                        if (oldPrice == 0 && newPrice > 0)
                             row.Cells[8].Style.BackColor = Color.Gray;
-                        }
+                        // Old price only (removed): OLD>0, NEW=0 — Grey
+                        else if (oldPrice > 0 && newPrice == 0)
+                            row.Cells[8].Style.BackColor = Color.Gray;
+                        else if (diffValue < 0)
+                            row.Cells[8].Style.BackColor = Color.LightGreen;
+                        else if (diffValue > 0)
+                            row.Cells[8].Style.BackColor = Color.Red;
                     }
                 }
                 
@@ -604,22 +600,28 @@ namespace aire
                 bool? IsOldTarget   = d.dt.Columns.Count > 20 ? d.dt.Rows[i][20] as bool? : null;
                 bool? IsMonthTarget = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
                 bool? IsTargetDeal  = d.dt.Columns.Count > 22 ? d.dt.Rows[i][22] as bool? : null;
+                bool? IsTargetDealOld = d.dt.Columns.Contains("IsTargetDealOld") && d.dt.Rows[i]["IsTargetDealOld"] != DBNull.Value
+                    ? (bool?)bool.Parse(d.dt.Rows[i]["IsTargetDealOld"].ToString()) : null;
 
-                if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                // Deals filter: show both Green (IsTargetDeal) and Orange (IsTargetDealOld)
+                if (radioTargetDeals.Checked  && !((IsTargetDeal.HasValue && IsTargetDeal.Value) || (IsTargetDealOld.HasValue && IsTargetDealOld.Value))) continue;
                 if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
                 if (double.Parse(d.dt.Rows[i][5].ToString()) == 0) continue; // skip rows with no current price
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                 double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
+                // Apply color with priority: Green > Orange > Purple > Yellow > Blue
                 if (IsTargetDeal.HasValue && IsTargetDeal.Value)
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                else if (IsTargetDealOld.HasValue && IsTargetDealOld.Value)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Orange;
                 else if (IsMonthTarget.HasValue && IsMonthTarget.Value)
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.MediumPurple;
-                else if (IsTargetFound.HasValue && IsTargetFound.Value)
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
                 else if (IsOldTarget.HasValue && IsOldTarget.Value)
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                else if (IsTargetFound.HasValue && IsTargetFound.Value)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
             }
             datagridvColor();
         }
@@ -844,22 +846,28 @@ namespace aire
                     bool? IsOldTarget   = d.dt.Columns.Count > 20 ? d.dt.Rows[i][20] as bool? : null;
                     bool? IsMonthTarget = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
                     bool? IsTargetDeal  = d.dt.Columns.Count > 22 ? d.dt.Rows[i][22] as bool? : null;
+                    bool? IsTargetDealOld = d.dt.Columns.Contains("IsTargetDealOld") && d.dt.Rows[i]["IsTargetDealOld"] != DBNull.Value
+                        ? (bool?)bool.Parse(d.dt.Rows[i]["IsTargetDealOld"].ToString()) : null;
 
-                    if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                    // Deals filter: show both Green (IsTargetDeal) and Orange (IsTargetDealOld)
+                    if (radioTargetDeals.Checked  && !((IsTargetDeal.HasValue && IsTargetDeal.Value) || (IsTargetDealOld.HasValue && IsTargetDealOld.Value))) continue;
                     if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
                     if (double.Parse(d.dt.Rows[i][5].ToString()) == 0) continue; // skip rows with no current price
 
                     int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                     double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][16].ToString()), double.Parse(d.dt.Rows[i][17].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][11].ToString(), d.dt.Rows[i][12].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][18]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
+                    // Apply color with priority: Green > Orange > Purple > Yellow > Blue
                     if (IsTargetDeal.HasValue && IsTargetDeal.Value)
                         dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                    else if (IsTargetDealOld.HasValue && IsTargetDealOld.Value)
+                        dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Orange;
                     else if (IsMonthTarget.HasValue && IsMonthTarget.Value)
                         dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.MediumPurple;
-                    else if (IsTargetFound.HasValue && IsTargetFound.Value)
-                        dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
                     else if (IsOldTarget.HasValue && IsOldTarget.Value)
                         dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                    else if (IsTargetFound.HasValue && IsTargetFound.Value)
+                        dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
                 }
 
             datagridvColor();

@@ -37,8 +37,9 @@ namespace aire
         public DateTime? DateNewPriceChanged { get; set; }
 
         // Target categorization properties
-        public bool? IsOldTarget { get; set; }  // Yellow: Difference between -5 and 0
-        public bool? IsMonthTarget { get; set; } // Purple: Blue records with different months
+        public bool? IsOldTarget { get; set; }     // Yellow: Difference between -5 and 0
+        public bool? IsMonthTarget { get; set; }   // Purple: Blue records with different months
         public bool? IsTargetDeal { get; set; }    // Green: Cheapest among all categories
+        public bool? IsTargetDealOld { get; set; } // Orange: Was Green, same price, still cheapest
     }
 }
