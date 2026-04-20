@@ -319,7 +319,10 @@ namespace aire
             {
                 MessageBox.Show("The information entered is not on the database!");
             }
-            
+
+            // Guard: if the grid has no columns yet (race condition on startup), skip population
+            if (dataGridView1.ColumnCount == 0) return;
+
             // Check if new categorization columns exist in the result set
             bool hasIsOldTarget = d.dt.Columns.Contains("IsOldTarget");
             bool hasIsMonthTarget = d.dt.Columns.Contains("IsMonthTarget");
@@ -587,13 +590,11 @@ namespace aire
 
             cnt = d.dt.Rows.Count;
 
-
-
             if (cnt == 0)
             {
-                    MessageBox.Show("The information entered is not on the database!");
-
+                MessageBox.Show("The information entered is not on the database!");
             }
+            if (dataGridView1.ColumnCount == 0) return;
             for (int i = 0; i < cnt; i++)
             {
                 bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
@@ -840,6 +841,7 @@ namespace aire
                 {
                     MessageBox.Show("The information entered is not on the database!");
                 }
+                if (dataGridView1.ColumnCount == 0) return;
                 for (int i = 0; i < cnt; i++)
                 {
                     bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
