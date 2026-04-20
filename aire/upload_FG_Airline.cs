@@ -493,6 +493,13 @@ namespace aire
                             cmdTrunc.ExecuteNonQuery();
                         }
 
+                        // Get destination column names so we only map columns that exist in Bob's DB
+                        var destColumns = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        using (SqlCommand cmdSchema = new SqlCommand("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'comprGOOGLAirline'", connNew))
+                        using (SqlDataReader schemaReader = cmdSchema.ExecuteReader())
+                            while (schemaReader.Read())
+                                destColumns.Add(schemaReader.GetString(0));
+
                         using (SqlCommand cmdSrc = new SqlCommand("SELECT * FROM comprGOOGLAirline", connOLD))
                         {
                             cmdSrc.CommandTimeout = 0;
@@ -503,8 +510,14 @@ namespace aire
                                 bulkCopy.BatchSize = 10000;
                                 bulkCopy.BulkCopyTimeout = 0;
 
+                                // Only map columns that exist in the destination — skips any new
+                                // columns not yet added to Bob's DB (e.g. IsTargetDealOld)
                                 for (int i = 0; i < reader.FieldCount; i++)
-                                    bulkCopy.ColumnMappings.Add(reader.GetName(i), reader.GetName(i));
+                                {
+                                    string col = reader.GetName(i);
+                                    if (destColumns.Contains(col))
+                                        bulkCopy.ColumnMappings.Add(col, col);
+                                }
 
                                 bulkCopy.NotifyAfter = 10000;
                                 long transferred = 0;
