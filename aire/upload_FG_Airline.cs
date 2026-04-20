@@ -731,6 +731,9 @@ namespace aire
 							d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
 							d.cmdd.CommandTimeout = processingTimeout;
 							d.cmdd.ExecuteNonQuery();
+
+							// Categorise all target colours: Yellow, Purple, Green, Orange
+							ClassTargetCategorization.CalculateAllTargetCategories(d.cn, ddlValue);
 						}
 						catch (SqlException ex)
 						{
@@ -773,7 +776,7 @@ namespace aire
 					dt = null;
 					d.dt = null;
 					
-					MessageBox.Show("Finish! Data processing completed. Target categorization is running in the background.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					MessageBox.Show("Finish! Data processing and target categorisation complete.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				}
 
 				// Execute cleanup procedure if it exists (optional)
