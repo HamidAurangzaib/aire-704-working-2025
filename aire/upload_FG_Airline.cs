@@ -458,21 +458,24 @@ namespace aire
 			}
 		}
 
+        private static readonly string connBobs  = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+        private static readonly string connAdmin = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+
+        // STEP 1 — Transfer admin data into comprGOOGLAirline_Staging on Bob's DB.
+        // The live comprGOOGLAirline table (and the website) is untouched during this.
+        // When done, click Publish (button9_2) to go live instantly.
         private async void button8_Click(object sender, EventArgs e)
         {
             button8.Enabled = false;
-            label8.Text = "Starting transfer...";
+            label8.Text = "Starting transfer to staging...";
             label1.Text = "";
-
-            string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
-            string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
 
             try
             {
                 await Task.Run(() =>
                 {
-                    using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
-                    using (SqlConnection connNew = new SqlConnection(connNEWStr1))
+                    using (SqlConnection connOLD = new SqlConnection(connAdmin))
+                    using (SqlConnection connNew = new SqlConnection(connBobs))
                     {
                         connOLD.Open();
                         connNew.Open();
@@ -487,15 +490,16 @@ namespace aire
                             return;
                         }
 
-                        using (SqlCommand cmdTrunc = new SqlCommand("TRUNCATE TABLE comprGOOGLAirline", connNew))
+                        // Truncate STAGING only — live table is untouched
+                        using (SqlCommand cmdTrunc = new SqlCommand("TRUNCATE TABLE comprGOOGLAirline_Staging", connNew))
                         {
                             cmdTrunc.CommandTimeout = 120;
                             cmdTrunc.ExecuteNonQuery();
                         }
 
-                        // Get destination column names so we only map columns that exist in Bob's DB
+                        // Get staging column names so we only map columns that exist there
                         var destColumns = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        using (SqlCommand cmdSchema = new SqlCommand("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'comprGOOGLAirline'", connNew))
+                        using (SqlCommand cmdSchema = new SqlCommand("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'comprGOOGLAirline_Staging'", connNew))
                         using (SqlDataReader schemaReader = cmdSchema.ExecuteReader())
                             while (schemaReader.Read())
                                 destColumns.Add(schemaReader.GetString(0));
@@ -506,12 +510,10 @@ namespace aire
                             using (SqlDataReader reader = cmdSrc.ExecuteReader())
                             using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connNew))
                             {
-                                bulkCopy.DestinationTableName = "comprGOOGLAirline";
+                                bulkCopy.DestinationTableName = "comprGOOGLAirline_Staging";
                                 bulkCopy.BatchSize = 10000;
                                 bulkCopy.BulkCopyTimeout = 0;
 
-                                // Only map columns that exist in the destination — skips any new
-                                // columns not yet added to Bob's DB (e.g. IsTargetDealOld)
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string col = reader.GetName(i);
@@ -534,13 +536,61 @@ namespace aire
                     }
                 });
 
-                label8.Text = "Transfer complete!";
-                label1.Text = "Done!";
+                label8.Text = "Transfer to staging complete! Click Publish to go live.";
+                label1.Text = "Ready to publish.";
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Transfer error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 label8.Text = "Transfer failed.";
+            }
+            finally
+            {
+                button8.Enabled = true;
+            }
+        }
+
+        // STEP 2 — Publish staging to live.
+        // Phase 1: Builds indexes on staging (few mins, website still live).
+        // Phase 2: Instant rename swap — staging becomes the live table.
+        // Phase 3: Drops old table, recreates empty staging for next upload.
+        public async void PublishStagingToLive()
+        {
+            var confirm = MessageBox.Show(
+                "This will publish the staged data to the live website.\n\n" +
+                "Phase 1: Build indexes on staging (~5 mins, website unaffected).\n" +
+                "Phase 2: Instant swap — website reads new data immediately.\n\n" +
+                "Continue?",
+                "Publish to Live", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes) return;
+
+            button8.Enabled = false;
+            label8.Text = "Publishing: building indexes on staging...";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (SqlConnection connNew = new SqlConnection(connBobs))
+                    {
+                        connNew.Open();
+                        using (SqlCommand cmd = new SqlCommand("EXEC PublishStagingToLive", connNew))
+                        {
+                            cmd.CommandTimeout = 0;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                });
+
+                label8.Text = "Publish complete! Website is now live with new data.";
+                label1.Text = "Published!";
+                MessageBox.Show("Website is now live with the new data.", "Publish Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Publish error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label8.Text = "Publish failed.";
             }
             finally
             {
