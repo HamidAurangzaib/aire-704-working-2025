@@ -4,8 +4,12 @@
 --
 -- Workflow after this:
 --   1. Transfer button uploads to comprGOOGLAirline_Staging  (slow, website unaffected)
---   2. Publish button calls PublishStagingToLive             (builds indexes, then instant swap)
+--   2. Publish button calls PublishStagingToLive             (copies indexes from live, then instant swap)
 --   3. Website reads from comprGOOGLAirline as normal
+--
+-- Dynamic index replication: PublishStagingToLive reads whatever indexes exist
+-- on comprGOOGLAirline at the time of publish and recreates them on staging.
+-- No manual updates needed when indexes are added or changed.
 -- ================================================================
 
 -- ----------------------------------------------------------------
@@ -50,8 +54,10 @@ GO
 -- ----------------------------------------------------------------
 -- PART 2: Create the publish stored procedure
 --
--- Phase 1: Build all indexes on staging while website still reads
---          the live comprGOOGLAirline table (no downtime)
+-- Phase 1: Dynamically read all indexes from the live comprGOOGLAirline
+--          table (using sys.indexes / sys.index_columns) and build the
+--          same indexes on comprGOOGLAirline_Staging while the website
+--          continues to read from the live table (no downtime).
 -- Phase 2: Instant rename swap — staging becomes live (metadata only,
 --          takes milliseconds regardless of row count)
 -- Phase 3: Drop old live table
@@ -67,44 +73,103 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- ---- Phase 1: Build indexes on staging ----
+    -- ---- Phase 1: Dynamically replicate indexes from live table to staging ----
+    -- Reads sys.indexes and sys.index_columns for comprGOOGLAirline and
+    -- builds the identical index set on comprGOOGLAirline_Staging.
     -- Website is still reading comprGOOGLAirline (live) during this phase.
-    -- This is the only step that takes a few minutes.
 
-    PRINT 'Phase 1: Building indexes on staging table...';
+    PRINT 'Phase 1: Building indexes on staging (mirroring live table)...';
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'PK_Staging')
-        CREATE CLUSTERED INDEX PK_Staging
-            ON dbo.comprGOOGLAirline_Staging (id);
+    DECLARE @liveObjId   INT = OBJECT_ID('dbo.comprGOOGLAirline');
+    DECLARE @idxName     NVARCHAR(128);
+    DECLARE @isUnique    BIT;
+    DECLARE @isClustered BIT;
+    DECLARE @keyCols     NVARCHAR(MAX);
+    DECLARE @inclCols    NVARCHAR(MAX);
+    DECLARE @sql         NVARCHAR(MAX);
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_airline_dates')
-        CREATE NONCLUSTERED INDEX idx_airline_dates
-            ON dbo.comprGOOGLAirline_Staging (Airline, Dates);
+    -- Cursor over every index on the live table (skip system stats indexes)
+    DECLARE idx_cursor CURSOR LOCAL FAST_FORWARD FOR
+        SELECT
+            i.name,
+            i.is_unique,
+            CASE i.type WHEN 1 THEN 1 ELSE 0 END AS is_clustered
+        FROM sys.indexes i
+        WHERE i.object_id = @liveObjId
+          AND i.type IN (1, 2)          -- 1=Clustered, 2=NonClustered
+          AND i.is_primary_key = 0      -- skip PK (we handle clustered by name)
+          AND i.is_unique_constraint = 0
+        ORDER BY i.type;                -- clustered first
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_dates')
-        CREATE NONCLUSTERED INDEX idx_dates
-            ON dbo.comprGOOGLAirline_Staging (Dates);
+    OPEN idx_cursor;
+    FETCH NEXT FROM idx_cursor INTO @idxName, @isUnique, @isClustered;
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_from')
-        CREATE NONCLUSTERED INDEX idx_from
-            ON dbo.comprGOOGLAirline_Staging ([From]);
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Skip if this index already exists on staging (idempotent)
+        IF EXISTS (
+            SELECT 1 FROM sys.indexes
+            WHERE object_id = OBJECT_ID('dbo.comprGOOGLAirline_Staging')
+              AND name = @idxName
+        )
+        BEGIN
+            PRINT '  Skipping (already exists): ' + @idxName;
+            FETCH NEXT FROM idx_cursor INTO @idxName, @isUnique, @isClustered;
+            CONTINUE;
+        END
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_from_to_dates')
-        CREATE NONCLUSTERED INDEX idx_from_to_dates
-            ON dbo.comprGOOGLAirline_Staging ([From], [To], Dates);
+        -- Build KEY columns list  (key_ordinal > 0, ordered)
+        SET @keyCols = '';
+        SELECT @keyCols = @keyCols +
+            QUOTENAME(c.name) +
+            CASE ic.is_descending_key WHEN 1 THEN ' DESC' ELSE ' ASC' END + ', '
+        FROM sys.index_columns ic
+        JOIN sys.columns c
+            ON c.object_id = ic.object_id
+           AND c.column_id = ic.column_id
+        WHERE ic.object_id  = @liveObjId
+          AND ic.index_id   = (SELECT index_id FROM sys.indexes
+                                WHERE object_id = @liveObjId AND name = @idxName)
+          AND ic.key_ordinal > 0
+        ORDER BY ic.key_ordinal;
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_from_to_dates_airline')
-        CREATE NONCLUSTERED INDEX idx_from_to_dates_airline
-            ON dbo.comprGOOGLAirline_Staging ([From], [To], Dates, Airline);
+        -- Trim trailing ", "
+        IF LEN(@keyCols) > 0
+            SET @keyCols = LEFT(@keyCols, LEN(@keyCols) - 2);
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_from_to_dates_airline_include')
-        CREATE NONCLUSTERED INDEX idx_from_to_dates_airline_include
-            ON dbo.comprGOOGLAirline_Staging ([From], [To], Dates, Airline)
-            INCLUDE (New_price, Stops, Days, Cabin);
+        -- Build INCLUDE columns list  (key_ordinal = 0, is_included_column = 1)
+        SET @inclCols = '';
+        SELECT @inclCols = @inclCols + QUOTENAME(c.name) + ', '
+        FROM sys.index_columns ic
+        JOIN sys.columns c
+            ON c.object_id = ic.object_id
+           AND c.column_id = ic.column_id
+        WHERE ic.object_id         = @liveObjId
+          AND ic.index_id          = (SELECT index_id FROM sys.indexes
+                                       WHERE object_id = @liveObjId AND name = @idxName)
+          AND ic.is_included_column = 1
+        ORDER BY ic.index_column_id;
 
-    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('comprGOOGLAirline_Staging') AND name = 'idx_to')
-        CREATE NONCLUSTERED INDEX idx_to
-            ON dbo.comprGOOGLAirline_Staging ([To]);
+        IF LEN(@inclCols) > 0
+            SET @inclCols = LEFT(@inclCols, LEN(@inclCols) - 2);
+
+        -- Compose the CREATE INDEX statement
+        SET @sql =
+            'CREATE ' +
+            CASE WHEN @isUnique = 1 THEN 'UNIQUE ' ELSE '' END +
+            CASE WHEN @isClustered = 1 THEN 'CLUSTERED ' ELSE 'NONCLUSTERED ' END +
+            'INDEX ' + QUOTENAME(@idxName) +
+            ' ON dbo.comprGOOGLAirline_Staging (' + @keyCols + ')' +
+            CASE WHEN LEN(@inclCols) > 0 THEN ' INCLUDE (' + @inclCols + ')' ELSE '' END;
+
+        PRINT '  Creating: ' + @idxName;
+        EXEC sp_executesql @sql;
+
+        FETCH NEXT FROM idx_cursor INTO @idxName, @isUnique, @isClustered;
+    END
+
+    CLOSE idx_cursor;
+    DEALLOCATE idx_cursor;
 
     PRINT 'Phase 1 complete. All indexes built on staging.';
 

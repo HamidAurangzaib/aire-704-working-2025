@@ -22,11 +22,11 @@ namespace aire
         {
             string query = @"
                 UPDATE comprGOOGLAirline
-                SET IsOldTarget = 
-                    CASE 
-                        WHEN Difference >= -5 AND Difference <= 0 
-                        THEN 1 
-                        ELSE 0 
+                SET IsOldTarget =
+                    CASE
+                        WHEN Difference >= -5 AND Difference <= 0 AND IsTargetFound = 1
+                        THEN 1
+                        ELSE 0
                     END
                 WHERE Name = @Name";
 
@@ -235,13 +235,14 @@ namespace aire
                 SET IsTargetDealOld = 0
                 WHERE Name = @Name;
 
-                -- Set IsTargetDealOld: was Green on a prior upload, price unchanged (IsOldTarget=1),
-                -- and still the cheapest for this route
+                -- Set IsTargetDealOld: was Green on a prior upload, price moved by no more than +5
+                -- (up or down), still within target (IsTargetFound=1), and still cheapest for this route
                 UPDATE curr
                 SET curr.IsTargetDealOld = 1
                 FROM comprGOOGLAirline curr
                 WHERE curr.Name = @Name
-                    AND curr.IsOldTarget = 1
+                    AND curr.IsTargetFound = 1
+                    AND curr.Difference BETWEEN -5 AND 5
                     AND curr.New_price > 0
                     -- Was previously IsTargetDeal (Green) for same route + flight date
                     AND EXISTS (
