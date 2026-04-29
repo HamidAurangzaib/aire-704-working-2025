@@ -597,6 +597,11 @@ namespace aire
                 button8.Enabled = true;
             }
         }
+        private void button9_Click(object sender, EventArgs e)
+        {
+            PublishStagingToLive();
+        }
+
         private void label7_Click(object sender, EventArgs e)
         {
 

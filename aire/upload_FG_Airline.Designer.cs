@@ -54,6 +54,7 @@
             this.btnDelete = new System.Windows.Forms.Button();
             this.ddlName = new System.Windows.Forms.ComboBox();
             this.button8 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.customerBindingSource)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -329,9 +330,22 @@
             this.button8.Text = "SYNC DATA";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
-            // 
+            //
+            // button9 (Publish)
+            //
+            this.button9.BackColor = System.Drawing.Color.DarkOrange;
+            this.button9.ForeColor = System.Drawing.Color.White;
+            this.button9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.button9.Location = new System.Drawing.Point(648, 524);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(136, 23);
+            this.button9.TabIndex = 98;
+            this.button9.Text = "Publish to Live";
+            this.button9.UseVisualStyleBackColor = false;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            //
             // label8
-            // 
+            //
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(486, 494);
             this.label8.Name = "label8";
@@ -345,6 +359,7 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(898, 590);
             this.Controls.Add(this.label8);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -407,6 +422,7 @@
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.ComboBox ddlName;
         private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Label label8;
     }
 }
