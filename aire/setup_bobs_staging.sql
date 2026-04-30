@@ -119,10 +119,11 @@ BEGIN
         END
 
         -- Build KEY columns list  (key_ordinal > 0, ordered)
+        -- Use comma-only separator (no trailing space) so LEN() trims correctly
         SET @keyCols = '';
         SELECT @keyCols = @keyCols +
             QUOTENAME(c.name) +
-            CASE ic.is_descending_key WHEN 1 THEN ' DESC' ELSE ' ASC' END + ', '
+            CASE ic.is_descending_key WHEN 1 THEN ' DESC' ELSE ' ASC' END + ','
         FROM sys.index_columns ic
         JOIN sys.columns c
             ON c.object_id = ic.object_id
@@ -133,13 +134,13 @@ BEGIN
           AND ic.key_ordinal > 0
         ORDER BY ic.key_ordinal;
 
-        -- Trim trailing ", "
+        -- Trim trailing ","
         IF LEN(@keyCols) > 0
-            SET @keyCols = LEFT(@keyCols, LEN(@keyCols) - 2);
+            SET @keyCols = LEFT(@keyCols, LEN(@keyCols) - 1);
 
         -- Build INCLUDE columns list  (key_ordinal = 0, is_included_column = 1)
         SET @inclCols = '';
-        SELECT @inclCols = @inclCols + QUOTENAME(c.name) + ', '
+        SELECT @inclCols = @inclCols + QUOTENAME(c.name) + ','
         FROM sys.index_columns ic
         JOIN sys.columns c
             ON c.object_id = ic.object_id
@@ -151,7 +152,7 @@ BEGIN
         ORDER BY ic.index_column_id;
 
         IF LEN(@inclCols) > 0
-            SET @inclCols = LEFT(@inclCols, LEN(@inclCols) - 2);
+            SET @inclCols = LEFT(@inclCols, LEN(@inclCols) - 1);
 
         -- Compose the CREATE INDEX statement
         SET @sql =
