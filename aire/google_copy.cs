@@ -635,7 +635,138 @@ namespace aire
 
         DataTableCollection tables;
 
+        private static readonly string connBobs  = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+        private static readonly string connAdmin = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
 
+        private async void button8_Click(object sender, EventArgs e)
+        {
+            button8.Enabled = false;
+            label8.Text = "Starting transfer to staging...";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (SqlConnection connOLD = new SqlConnection(connAdmin))
+                    using (SqlConnection connNew = new SqlConnection(connBobs))
+                    {
+                        connOLD.Open();
+                        connNew.Open();
+
+                        long totalRows = 0;
+                        using (SqlCommand cmdCount = new SqlCommand("SELECT COUNT(*) FROM comprGOOGLCOPY", connOLD))
+                            totalRows = (int)cmdCount.ExecuteScalar();
+
+                        if (totalRows == 0)
+                        {
+                            this.Invoke((MethodInvoker)(() => label8.Text = "No rows to transfer."));
+                            return;
+                        }
+
+                        using (SqlCommand cmdTrunc = new SqlCommand("TRUNCATE TABLE comprGOOGLCOPY_Staging", connNew))
+                        {
+                            cmdTrunc.CommandTimeout = 120;
+                            cmdTrunc.ExecuteNonQuery();
+                        }
+
+                        var destColumns = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        using (SqlCommand cmdSchema = new SqlCommand("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'comprGOOGLCOPY_Staging'", connNew))
+                        using (SqlDataReader schemaReader = cmdSchema.ExecuteReader())
+                            while (schemaReader.Read())
+                                destColumns.Add(schemaReader.GetString(0));
+
+                        using (SqlCommand cmdSrc = new SqlCommand("SELECT * FROM comprGOOGLCOPY", connOLD))
+                        {
+                            cmdSrc.CommandTimeout = 0;
+                            using (SqlDataReader reader = cmdSrc.ExecuteReader())
+                            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connNew))
+                            {
+                                bulkCopy.DestinationTableName = "comprGOOGLCOPY_Staging";
+                                bulkCopy.BatchSize = 10000;
+                                bulkCopy.BulkCopyTimeout = 0;
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string col = reader.GetName(i);
+                                    if (destColumns.Contains(col))
+                                        bulkCopy.ColumnMappings.Add(col, col);
+                                }
+
+                                bulkCopy.NotifyAfter = 10000;
+                                long transferred = 0;
+                                bulkCopy.SqlRowsCopied += (s, ev) =>
+                                {
+                                    transferred = ev.RowsCopied;
+                                    this.Invoke((MethodInvoker)(() =>
+                                        label8.Text = "Transferring: " + transferred.ToString("N0") + " / " + totalRows.ToString("N0")));
+                                };
+
+                                bulkCopy.WriteToServer(reader);
+                            }
+                        }
+                    }
+                });
+
+                label8.Text = "Transfer to staging complete! Click Publish to go live.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Transfer error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label8.Text = "Transfer failed.";
+            }
+            finally
+            {
+                button8.Enabled = true;
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            PublishStagingToLiveCopy();
+        }
+
+        public async void PublishStagingToLiveCopy()
+        {
+            var confirm = MessageBox.Show(
+                "This will publish the staged COPY data to the live website.\n\n" +
+                "Phase 1: Build indexes on staging (~few mins, website unaffected).\n" +
+                "Phase 2: Instant swap — website reads new data immediately.\n\n" +
+                "Continue?",
+                "Publish Copy to Live", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes) return;
+
+            button8.Enabled = false;
+            label8.Text = "Publishing: building indexes on staging...";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (SqlConnection connNew = new SqlConnection(connBobs))
+                    {
+                        connNew.Open();
+                        using (SqlCommand cmd = new SqlCommand("EXEC PublishStagingToLive_Copy", connNew))
+                        {
+                            cmd.CommandTimeout = 0;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                });
+
+                label8.Text = "Publish complete! Website is now live with new data.";
+                MessageBox.Show("Website is now live with the new COPY data.", "Publish Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Publish error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label8.Text = "Publish failed.";
+            }
+            finally
+            {
+                button8.Enabled = true;
+            }
+        }
 
     }
 }

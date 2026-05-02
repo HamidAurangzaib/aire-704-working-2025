@@ -73,6 +73,16 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- ---- Safety check: refuse to publish if staging is empty ----
+    DECLARE @stagingRows INT;
+    SELECT @stagingRows = COUNT(*) FROM dbo.comprGOOGLAirline_Staging;
+    IF @stagingRows = 0
+    BEGIN
+        RAISERROR('Staging table is empty — publish aborted to prevent data loss. Run Transfer first.', 16, 1);
+        RETURN;
+    END
+    PRINT 'Safety check passed: ' + CAST(@stagingRows AS NVARCHAR) + ' rows in staging.';
+
     -- ---- Phase 1: Dynamically replicate indexes from live table to staging ----
     -- Reads sys.indexes and sys.index_columns for comprGOOGLAirline and
     -- builds the identical index set on comprGOOGLAirline_Staging.
