@@ -565,6 +565,11 @@ namespace aire
                             d.cmdd = new SqlCommand("exec upd_cmprgoogleCOPY", d.cn);
                             d.cmdd.CommandTimeout = 0;
                             d.cmdd.ExecuteNonQuery();
+
+                            // Re-flag the target rows (Blue / Yellow / Purple / Green)
+                            d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFDomesticAirline", d.cn);
+                            d.cmdd.CommandTimeout = 0;
+                            d.cmdd.ExecuteNonQuery();
                         }
                     });
 
