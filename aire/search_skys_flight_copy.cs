@@ -125,10 +125,10 @@ namespace aire
                         double oldPrice  = Convert.ToDouble(row.Cells[4].Value);
                         double newPrice  = Convert.ToDouble(row.Cells[5].Value);
 
-                        // New deal (no previous price): OLD=0, NEW>0 — Cyan, whatever the diff says
+                        // New price (no previous): OLD=0, NEW>0 — always Grey regardless of diff
                         if (oldPrice == 0 && newPrice > 0)
                         {
-                            row.Cells[6].Style.BackColor = Color.Cyan;
+                            row.Cells[6].Style.BackColor = Color.Gray;
                         }
                         // Old price only (route gone): OLD>0, NEW=0 — Grey
                         else if (oldPrice > 0 && newPrice == 0)
@@ -257,10 +257,10 @@ namespace aire
                     double oldPrice  = Convert.ToDouble(row.Cells[4].Value);
                     double newPrice  = Convert.ToDouble(row.Cells[5].Value);
 
-                    // New deal (no previous price): OLD=0, NEW>0 — Cyan, whatever the diff says
+                    // New price (no previous): OLD=0, NEW>0 — always Grey regardless of diff
                     if (oldPrice == 0 && newPrice > 0)
                     {
-                        row.Cells[6].Style.BackColor = Color.Cyan;
+                        row.Cells[6].Style.BackColor = Color.Gray;
                     }
                     // Old price only (route gone): OLD>0, NEW=0 — Grey
                     else if (oldPrice > 0 && newPrice == 0)

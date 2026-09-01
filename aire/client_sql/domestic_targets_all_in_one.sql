@@ -44,8 +44,8 @@ DECLARE @sql NVARCHAR(MAX);
 --
 -- The domestic side never had this problem because upd_cmprgoogleCOPY
 -- forces Difference = 0 when Olde_price = 0. This makes the Airline
--- side behave the same way. In the application these rows are shown in
--- CYAN ("new deal"), separate from GREY ("route gone").
+-- side behave the same way. In the application these rows stay GREY, the
+-- same as a route that has gone.
 -- ------------------------------------------------------------
 SET @sql = N'ALTER PROCEDURE [dbo].[upd_cmprgoogleAirline]
 AS
