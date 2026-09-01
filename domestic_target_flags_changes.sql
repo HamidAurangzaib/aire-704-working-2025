@@ -2,10 +2,11 @@
 -- domestic_target_flags_changes.sql
 -- Run this in SSMS against DB_A61545_andycom
 --
--- PART A: "new deal" fix (Olde_price = 0 must give Difference = 0
---          so the grid paints the Difference cell ORANGE, not RED)
--- PART B: full target categorisation (Blue / Yellow / Purple / Green)
+-- PART A: "new deal" fix - a route with no old price must not be reported
+--          as a price rise (Difference must be 0, not New_price)
+-- PART B: full target categorisation (Blue / Yellow / Purple / Green / Orange)
 --          for the COPY (domestic) side - comprGOOGLCOPY
+-- PART C: refresh both target procedures for the data already loaded
 -- ============================================================
 
 
@@ -15,12 +16,17 @@
 -- Step 1 of upd_cmprgoogleAirline used to be an unconditional
 --     UPDATE comprGOOGLAirline SET [Difference] = New_price - Olde_price;
 -- so a route that only exists in the NEW file (Olde_price = 0) got
--- Difference = New_price, i.e. a big POSITIVE number, and the grid
--- painted it RED ("gone up") instead of ORANGE ("new deal").
+-- Difference = New_price, i.e. a big POSITIVE number, which reads as a
+-- price rise ("gone up") when it is really a brand new deal.
+--
+-- That wrong figure is not only a colour problem: the target rules
+-- (Difference <= -5) and the "Red Diff" search filter (Difference > 0)
+-- both read it.
 --
 -- The domestic side never had this problem because upd_cmprgoogleCOPY
 -- forces Difference = 0 when Olde_price = 0. This makes the Airline
--- side behave the same way.
+-- side behave the same way. In the application these rows are shown in
+-- CYAN ("new deal"), separate from GREY ("route gone").
 -- ------------------------------------------------------------
 ALTER PROCEDURE [dbo].[upd_cmprgoogleAirline]
 AS
@@ -67,8 +73,8 @@ BEGIN
 
     -- Step 1: Recalculate Difference.
     --         Olde_price = 0 means the route is only in the NEW file, so there
-    --         is nothing to compare against: keep Difference = 0 -> ORANGE
-    --         ("new deal") instead of a positive number -> RED ("gone up").
+    --         is nothing to compare against: keep Difference = 0 rather than
+    --         a positive number that would read as a price rise.
     UPDATE comprGOOGLAirline
     SET [Difference] = CASE
                           WHEN ISNULL(Olde_price, 0) = 0 THEN 0
@@ -132,8 +138,8 @@ END;
 
 GO
 
--- One-off repair of the rows that are already wrong in the table, so you do
--- not have to wait for the next upload to see the ORANGE "new deal" rows.
+-- One-off repair of the rows that are already wrong in the table (139,996 of
+-- them), so you do not have to wait for the next upload.
 UPDATE dbo.comprGOOGLAirline
 SET [Difference] = 0
 WHERE ISNULL(Olde_price, 0) = 0
@@ -145,8 +151,8 @@ GO
 -- ============================================================
 -- PART B - TARGET PRICES FOR COPY (DOMESTIC)
 -- ============================================================
--- comprGOOGLCOPY already has IsOldTarget / IsMonthTarget / IsTargetDeal
--- columns, but nothing was filling them and the search procs did not
+-- comprGOOGLCOPY already has the IsOldTarget / IsMonthTarget / IsTargetDeal
+-- flag columns, but nothing was filling them and the search procs did not
 -- return them. This is the domestic mirror of target_flags_changes.sql.
 --
 --   Blue   (IsTargetFound)   : New_price <= target AND Difference <= -5
@@ -277,8 +283,8 @@ GO
 
 -- ------------------------------------------------------------
 -- B2. serchWithoutFromToGOOGleDomestic
---     Adds IsOldTarget / IsMonthTarget / IsTargetDeal after ai.photo
---     (result columns 18, 19, 20 - the C# reads them by index).
+--     Adds IsOldTarget / IsMonthTarget / IsTargetDeal / IsTargetDealOld
+--     after ai.photo (result columns 18-21 - the app reads them by index).
 -- ------------------------------------------------------------
 ALTER PROC [dbo].[serchWithoutFromToGOOGleDomestic]
 @From NVARCHAR(MAX) = '', @To NVARCHAR(MAX) = '', @IsTargetOnly bit,
