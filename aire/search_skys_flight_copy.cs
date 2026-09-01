@@ -121,23 +121,27 @@ namespace aire
 
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
+                        double diffValue = Convert.ToDouble(row.Cells[6].Value);
+                        double oldPrice  = Convert.ToDouble(row.Cells[4].Value);
+                        double newPrice  = Convert.ToDouble(row.Cells[5].Value);
 
-                        if (Convert.ToDouble(row.Cells[6].Value) < 0)
+                        // New deal (no previous price): OLD=0, NEW>0 — Cyan, whatever the diff says
+                        if (oldPrice == 0 && newPrice > 0)
+                        {
+                            row.Cells[6].Style.BackColor = Color.Cyan;
+                        }
+                        // Old price only (route gone): OLD>0, NEW=0 — Grey
+                        else if (oldPrice > 0 && newPrice == 0)
+                        {
+                            row.Cells[6].Style.BackColor = Color.Gray;
+                        }
+                        else if (diffValue < 0)
                         {
                             row.Cells[6].Style.BackColor = Color.LightGreen;
                         }
-                        else if (Convert.ToDouble(row.Cells[6].Value) > 0)
+                        else if (diffValue > 0)
                         {
                             row.Cells[6].Style.BackColor = Color.Red;
-                        }
-                        if (Convert.ToDouble(row.Cells[6].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
-                        {
-                            row.Cells[6].Style.BackColor = Color.Orange;
-                        }
-                        if (Convert.ToDouble(row.Cells[6].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
-                        {
-                            row.Cells[6].Style.BackColor = Color.Gray;
-
                         }
                     }
                     foreach (DataGridViewRow row in dataGridView1.Rows)
@@ -249,22 +253,27 @@ namespace aire
                
                 foreach (DataGridViewRow row in dataGridView2.Rows)
                 {
-                    if (Convert.ToDouble(row.Cells[6].Value) < 0)
+                    double diffValue = Convert.ToDouble(row.Cells[6].Value);
+                    double oldPrice  = Convert.ToDouble(row.Cells[4].Value);
+                    double newPrice  = Convert.ToDouble(row.Cells[5].Value);
+
+                    // New deal (no previous price): OLD=0, NEW>0 — Cyan, whatever the diff says
+                    if (oldPrice == 0 && newPrice > 0)
+                    {
+                        row.Cells[6].Style.BackColor = Color.Cyan;
+                    }
+                    // Old price only (route gone): OLD>0, NEW=0 — Grey
+                    else if (oldPrice > 0 && newPrice == 0)
+                    {
+                        row.Cells[6].Style.BackColor = Color.Gray;
+                    }
+                    else if (diffValue < 0)
                     {
                         row.Cells[6].Style.BackColor = Color.LightGreen;
                     }
-                    else if (Convert.ToDouble(row.Cells[6].Value) > 0)
+                    else if (diffValue > 0)
                     {
                         row.Cells[6].Style.BackColor = Color.Red;
-                    }
-                    if (Convert.ToDouble(row.Cells[6].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) == 0 && Convert.ToDouble(row.Cells[5].Value) > 0)
-                    {
-                        row.Cells[6].Style.BackColor = Color.Orange;
-                    }
-                    if (Convert.ToDouble(row.Cells[6].Value) == 0 && Convert.ToDouble(row.Cells[4].Value) > 0 && Convert.ToDouble(row.Cells[5].Value) == 0)
-                    {
-                        row.Cells[6].Style.BackColor = Color.Gray;
-
                     }
                 }
             });
@@ -834,27 +843,31 @@ namespace aire
             }
             for (int i = 0; i < cnt; i++)
             {
-                bool? IsTargetFound = d.dt.Rows[i][14] as bool?;
-                bool? IsOldTarget   = d.dt.Columns.Count > 18 ? d.dt.Rows[i][18] as bool? : null;
-                bool? IsMonthTarget = d.dt.Columns.Count > 19 ? d.dt.Rows[i][19] as bool? : null;
-                bool? IsTargetDeal  = d.dt.Columns.Count > 20 ? d.dt.Rows[i][20] as bool? : null;
+                bool? IsTargetFound   = d.dt.Rows[i][14] as bool?;
+                bool? IsOldTarget     = d.dt.Columns.Count > 18 ? d.dt.Rows[i][18] as bool? : null;
+                bool? IsMonthTarget   = d.dt.Columns.Count > 19 ? d.dt.Rows[i][19] as bool? : null;
+                bool? IsTargetDeal    = d.dt.Columns.Count > 20 ? d.dt.Rows[i][20] as bool? : null;
+                bool? IsTargetDealOld = d.dt.Columns.Count > 21 ? d.dt.Rows[i][21] as bool? : null;
 
-                if (radioTargetDeals.Checked  && !(IsTargetDeal.HasValue  && IsTargetDeal.Value))  continue;
+                // Deals filter: show both Green (IsTargetDeal) and Orange (IsTargetDealOld)
+                if (radioTargetDeals.Checked  && !((IsTargetDeal.HasValue && IsTargetDeal.Value) || (IsTargetDealOld.HasValue && IsTargetDealOld.Value))) continue;
                 if (radioTargetMonths.Checked && !(IsMonthTarget.HasValue && IsMonthTarget.Value)) continue;
 
                 int rowIndex = dataGridView1.Rows.Add(d.dt.Rows[i][0].ToString(), d.dt.Rows[i][1].ToString(), d.dt.Rows[i][2].ToString(), DateTime.Parse(d.dt.Rows[i][3].ToString()),
                 double.Parse(d.dt.Rows[i][4].ToString()), double.Parse(d.dt.Rows[i][5].ToString()), double.Parse(d.dt.Rows[i][6].ToString()), double.Parse(d.dt.Rows[i][7].ToString()), d.dt.Rows[i][8].ToString(), d.dt.Rows[i][9].ToString(), d.dt.Rows[i][10].ToString(), d.dt.Rows[i][12].ToString(), d.dt.Rows[i][11].ToString(), DateTime.Parse(d.dt.Rows[i][15].ToString()), d.dt.Rows[i][13].ToString(), DateTime.TryParse(d.dt.Rows[i][16]?.ToString(), out var dt) ? dt : (DateTime?)null);
 
                 // Target colours, same priority as the Airline screen:
-                // Green (best deal) > Purple (month target) > Blue (target found) > Yellow (old target)
+                // Green > Orange > Purple > Yellow > Blue
                 if (IsTargetDeal.HasValue && IsTargetDeal.Value)
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                else if (IsTargetDealOld.HasValue && IsTargetDealOld.Value)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Orange;
                 else if (IsMonthTarget.HasValue && IsMonthTarget.Value)
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.MediumPurple;
-                else if (IsTargetFound.HasValue && IsTargetFound.Value)
-                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
                 else if (IsOldTarget.HasValue && IsOldTarget.Value)
                     dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                else if (IsTargetFound.HasValue && IsTargetFound.Value)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.SkyBlue;
             }
 
 

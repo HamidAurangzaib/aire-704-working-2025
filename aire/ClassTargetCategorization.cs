@@ -18,7 +18,7 @@ namespace aire
         /// Categorizes records as IsOldTarget (Yellow) based on difference criteria
         /// Difference must be between -5 and 0 (inclusive): 0, -1, -2, -3, -4, -5
         /// </summary>
-        public static void CalculateIsOldTarget(SqlConnection connection, string name)
+        public static void CalculateIsOldTarget(SqlConnection connection, string name, string table = "comprGOOGLAirline")
         {
             string query = @"
                 UPDATE comprGOOGLAirline
@@ -29,6 +29,8 @@ namespace aire
                         ELSE 0
                     END
                 WHERE Name = @Name";
+
+            query = query.Replace("comprGOOGLAirline", table);
 
             using (SqlCommand cmd = new SqlCommand(query, connection))
             {
@@ -48,7 +50,7 @@ namespace aire
         /// If a cheaper price exists in the same month (including RED records or new-only records with Old=0),
         /// the blue row stays IsTargetFound only.
         /// </summary>
-        public static void CalculateIsMonthTarget(SqlConnection connection, string name)
+        public static void CalculateIsMonthTarget(SqlConnection connection, string name, string table = "comprGOOGLAirline")
         {
             string query = @"
                 -- Reset IsMonthTarget
@@ -97,6 +99,8 @@ namespace aire
                             )
                     )";
 
+            query = query.Replace("comprGOOGLAirline", table);
+
             using (SqlCommand cmd = new SqlCommand(query, connection))
             {
                 cmd.CommandTimeout = 0;
@@ -113,7 +117,7 @@ namespace aire
         /// - All other blue records (IsTargetFound=1) with same criteria
         /// Only blue records that are cheaper than ALL of these become Green (TargetDeal)
         /// </summary>
-        public static void CalculateTargetDeal(SqlConnection connection, string name)
+        public static void CalculateTargetDeal(SqlConnection connection, string name, string table = "comprGOOGLAirline")
         {
             string query = @"
                 -- Reset IsTargetDeal
@@ -177,6 +181,8 @@ namespace aire
                             AND otherBlue.New_price < blue.New_price
                     )";
 
+            query = query.Replace("comprGOOGLAirline", table);
+
             using (SqlCommand cmd = new SqlCommand(query, connection))
             {
                 cmd.CommandTimeout = 0;
@@ -190,7 +196,7 @@ namespace aire
         /// If a TargetDeal already exists in a month, no other row in that month needs to be purple —
         /// the TargetDeal IS the cheapest for that month, so others revert to IsTargetFound (Blue).
         /// </summary>
-        public static void ResetMonthTargetWhenTargetDealExists(SqlConnection connection, string name)
+        public static void ResetMonthTargetWhenTargetDealExists(SqlConnection connection, string name, string table = "comprGOOGLAirline")
         {
             string query = @"
                 UPDATE blue
@@ -212,6 +218,8 @@ namespace aire
                             AND YEAR(blue.Dates)  = YEAR(green.Dates)
                     )";
 
+            query = query.Replace("comprGOOGLAirline", table);
+
             using (SqlCommand cmd = new SqlCommand(query, connection))
             {
                 cmd.CommandTimeout = 0;
@@ -227,7 +235,7 @@ namespace aire
         /// AND are still the cheapest — i.e. no other record has a lower New_price for the same route.
         /// This persists upload-to-upload until the price changes (which moves it back to blue or red).
         /// </summary>
-        public static void CalculateIsTargetDealOld(SqlConnection connection, string name)
+        public static void CalculateIsTargetDealOld(SqlConnection connection, string name, string table = "comprGOOGLAirline")
         {
             string query = @"
                 -- Reset IsTargetDealOld
@@ -275,6 +283,8 @@ namespace aire
                             AND cheaper.id <> curr.id
                     )";
 
+            query = query.Replace("comprGOOGLAirline", table);
+
             using (SqlCommand cmd = new SqlCommand(query, connection))
             {
                 cmd.CommandTimeout = 0;
@@ -286,23 +296,23 @@ namespace aire
         /// <summary>
         /// Runs all target categorization calculations in order
         /// </summary>
-        public static void CalculateAllTargetCategories(SqlConnection connection, string name)
+        public static void CalculateAllTargetCategories(SqlConnection connection, string name, string table = "comprGOOGLAirline")
         {
             // Step 1: Calculate IsOldTarget (Yellow)
-            CalculateIsOldTarget(connection, name);
+            CalculateIsOldTarget(connection, name, table);
 
             // Step 2: Calculate IsMonthTarget (Purple)
-            CalculateIsMonthTarget(connection, name);
+            CalculateIsMonthTarget(connection, name, table);
 
             // Step 3: Calculate IsTargetDeal (Green)
-            CalculateTargetDeal(connection, name);
+            CalculateTargetDeal(connection, name, table);
 
             // Step 4: Remove purple from months that already have a IsTargetDeal (Green).
             //         Those rows revert to IsTargetFound (Blue) — the IsTargetDeal is the cheapest.
-            ResetMonthTargetWhenTargetDealExists(connection, name);
+            ResetMonthTargetWhenTargetDealExists(connection, name, table);
 
             // Step 5: Calculate IsTargetDealOld (Orange) — was Green, same price, still cheapest
-            CalculateIsTargetDealOld(connection, name);
+            CalculateIsTargetDealOld(connection, name, table);
         }
 
         /// <summary>

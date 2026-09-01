@@ -566,10 +566,14 @@ namespace aire
                             d.cmdd.CommandTimeout = 0;
                             d.cmdd.ExecuteNonQuery();
 
-                            // Re-flag the target rows (Blue / Yellow / Purple / Green)
+                            // Re-flag the target rows, same as the Airline upload does:
+                            // the proc sets IsTargetFound/IsOldTarget from tblGfDomesticTarget,
+                            // then the shared categoriser works out Yellow/Purple/Green/Orange.
                             d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFDomesticAirline", d.cn);
                             d.cmdd.CommandTimeout = 0;
                             d.cmdd.ExecuteNonQuery();
+
+                            ClassTargetCategorization.CalculateAllTargetCategories(d.cn, ddlValue, "comprGOOGLCOPY");
                         }
                     });
 

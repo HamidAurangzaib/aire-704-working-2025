@@ -149,10 +149,17 @@ GO
 -- columns, but nothing was filling them and the search procs did not
 -- return them. This is the domestic mirror of target_flags_changes.sql.
 --
---   Blue   (IsTargetFound) : New_price <= target AND Difference <= -5
---   Yellow (IsOldTarget)   : New_price <= target AND -5 < Difference <= 0
---   Purple (IsMonthTarget) : Blue row that has a Yellow row in another month
---   Green  (IsTargetDeal)  : Blue row that is the cheapest of its group
+--   Blue   (IsTargetFound)   : New_price <= target AND Difference <= -5
+--   Yellow (IsOldTarget)     : New_price <= target AND -5 < Difference <= 0
+--   Purple (IsMonthTarget)   : Blue row that has a Yellow row in another month
+--   Green  (IsTargetDeal)    : Blue row that is the cheapest of its group
+--   Orange (IsTargetDealOld) : was Green on an earlier upload and still cheapest
+--
+-- This procedure only fills IsTargetFound / IsOldTarget from the target table
+-- and clears the rest. The remaining four flags are worked out by the shared
+-- ClassTargetCategorization code, which google_copy now calls with the
+-- comprGOOGLCOPY table straight after this procedure - exactly the way the
+-- Airline upload does it.
 --
 -- Note: comprGOOGLCOPY / tblGfDomesticTarget have no OtaDiscount / OtaTotal
 -- columns, so the OTA part of the Airline procedure is not ported.
@@ -167,6 +174,9 @@ IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('comprGOOGL
 GO
 IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('comprGOOGLCOPY') AND name = 'IsTargetDeal')
     ALTER TABLE comprGOOGLCOPY ADD IsTargetDeal bit NULL;
+GO
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('comprGOOGLCOPY') AND name = 'IsTargetDealOld')
+    ALTER TABLE comprGOOGLCOPY ADD IsTargetDealOld bit NULL;
 GO
 
 
@@ -197,8 +207,9 @@ BEGIN
             WHEN c.[New_price] <= t.[Price] AND c.[Difference] > -5 AND c.[Difference] <= 0 THEN 1
             ELSE 0
         END,
-        c.IsMonthTarget = 0,
-        c.IsTargetDeal  = 0
+        c.IsMonthTarget   = 0,
+        c.IsTargetDeal    = 0,
+        c.IsTargetDealOld = 0
     FROM dbo.comprGOOGLCOPY c
     LEFT JOIN dbo.tblGfDomesticTarget t
         ON  c.[From]    = t.[From]
@@ -301,7 +312,7 @@ With TheDates AS (
             )
 
 select m.[From],m.[To],m.citys,m.Dates,m.Olde_price,m.New_price,m.[Difference],m.Cheapest,m.Airline,m.Aircode,m.Cabin,m.[Days],m.Stops,m.web,m.IsTargetFound,m.NewUploadDate, m.DateNewPriceChanged, ai.photo,
-       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal
+       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal, m.IsTargetDealOld
 From comprGOOGLCOPY m left join airlinex ai on m.Airline = ai.Airline WHERE (m.Aircode = @Aircode OR @Aircode = '') AND (m.Days = CONCAT(@Days, ' Nights') OR m.Days = @Days OR @Days = '')
 AND (m.Stops = @Stops OR @Stops = '')
 AND (m.Cabin = @Cabin OR @Cabin = '') AND (m.Airline = @Airline OR @Airline = '')
@@ -412,7 +423,7 @@ WITH MatchedFromCities AS (
     SELECT t1.[From], t1.[To], t1.citys, t1.Dates, t1.Olde_price, t1.New_price,
            t1.[Difference], t1.Cheapest, t1.Airline, t1.Aircode, t1.Cabin, t1.[Days],
            t1.Stops, t1.web, t1.IsTargetFound, T1.NewUploadDate, t1.DateNewPriceChanged,
-           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal
+           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal, t1.IsTargetDealOld
     FROM comprGOOGLCOPY t1
     INNER JOIN CodeCitys f ON t1.[From] = f.code
     WHERE (
@@ -431,7 +442,7 @@ WITH MatchedFromCities AS (
     SELECT t1.[From], t1.[To], t1.citys, t1.Dates, t1.Olde_price, t1.New_price,
            t1.[Difference], t1.Cheapest, t1.Airline, t1.Aircode, t1.Cabin, t1.[Days],
            t1.Stops, t1.web, t1.IsTargetFound, T1.NewUploadDate, t1.DateNewPriceChanged,
-           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal
+           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal, t1.IsTargetDealOld
     FROM comprGOOGLCOPY t1
     WHERE (@EverywhereFrom = 0 AND t1.[From] IN (SELECT MatchedFromCity FROM #CitiesStatus))
 )
@@ -446,7 +457,7 @@ WITH MatchedFromCities AS (
 SELECT m.[From], m.[To], m.citys, m.Dates, m.Olde_price, m.New_price,
        m.[Difference], m.Cheapest, m.Airline, m.Aircode, m.Cabin, m.[Days],
        m.Stops, m.web, m.IsTargetFound, m.NewUploadDate, m.DateNewPriceChanged, ai.photo,
-       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal
+       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal, m.IsTargetDealOld
 FROM MatchedFromCities m left join airlinex ai on m.Airline = ai.Airline
 WHERE (m.Aircode = @Aircode OR @Aircode = '') AND (m.Days = CONCAT(@Days, ' Nights') OR m.Days = @Days OR @Days = '')
 AND (m.Stops = @Stops OR @Stops = '')
@@ -558,7 +569,7 @@ WITH MatchedToCities AS (
     SELECT t1.[From], t1.[To], t1.citys, t1.Dates, t1.Olde_price, t1.New_price,
            t1.[Difference], t1.Cheapest, t1.Airline, t1.Aircode, t1.Cabin, t1.[Days],
            t1.Stops, t1.web, t1.IsTargetFound, T1.NewUploadDate, t1.DateNewPriceChanged,
-           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal
+           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal, t1.IsTargetDealOld
     FROM comprGOOGLCOPY t1
     INNER JOIN CodeCitys f ON t1.[To] = f.code
     WHERE (
@@ -577,7 +588,7 @@ WITH MatchedToCities AS (
     SELECT t1.[From], t1.[To], t1.citys, t1.Dates, t1.Olde_price, t1.New_price,
            t1.[Difference], t1.Cheapest, t1.Airline, t1.Aircode, t1.Cabin, t1.[Days],
            t1.Stops, t1.web, t1.IsTargetFound, T1.NewUploadDate, t1.DateNewPriceChanged,
-           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal
+           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal, t1.IsTargetDealOld
     FROM comprGOOGLCOPY t1
     WHERE (@EverywhereTo = 0 AND t1.[To] IN (SELECT MatchedToCity FROM #CitiesStatus))
 )
@@ -592,7 +603,7 @@ WITH MatchedToCities AS (
 SELECT m.[From], m.[To], m.citys, m.Dates, m.Olde_price, m.New_price,
        m.[Difference], m.Cheapest, m.Airline, m.Aircode, m.Cabin, m.[Days],
        m.Stops, m.web, m.IsTargetFound, m.NewUploadDate, m.DateNewPriceChanged, ai.photo,
-       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal
+       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal, m.IsTargetDealOld
 from MatchedToCities m left join airlinex ai on m.Airline = ai.Airline
 WHERE (m.Aircode = @Aircode OR @Aircode = '') AND (m.Days = CONCAT(@Days, ' Nights') OR m.Days = @Days OR @Days = '')
 AND (m.Stops = @Stops OR @Stops = '')
@@ -730,7 +741,7 @@ WITH MatchedFromCities AS (
     SELECT t1.[From], t1.[To], t1.citys, t1.Dates, t1.Olde_price, t1.New_price,
            t1.[Difference], t1.Cheapest, t1.Airline, t1.Aircode, t1.Cabin, t1.[Days],
            t1.Stops, t1.web, t1.IsTargetFound, T1.NewUploadDate, t1.DateNewPriceChanged,
-           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal
+           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal, t1.IsTargetDealOld
     FROM comprGOOGLCOPY t1
     INNER JOIN CodeCitys f ON t1.[From] = f.code
     WHERE (
@@ -749,7 +760,7 @@ WITH MatchedFromCities AS (
     SELECT t1.[From], t1.[To], t1.citys, t1.Dates, t1.Olde_price, t1.New_price,
            t1.[Difference], t1.Cheapest, t1.Airline, t1.Aircode, t1.Cabin, t1.[Days],
            t1.Stops, t1.web, t1.IsTargetFound, T1.NewUploadDate, t1.DateNewPriceChanged,
-           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal
+           t1.IsOldTarget, t1.IsMonthTarget, t1.IsTargetDeal, t1.IsTargetDealOld
     FROM comprGOOGLCOPY t1
     WHERE (@EverywhereFrom = 0 AND t1.[From] IN (SELECT MatchedFromCity FROM #CitiesStatus))
 ),
@@ -790,7 +801,7 @@ MatchedToCities AS (
 SELECT m.[From], m.[To], m.citys, m.Dates, m.Olde_price, m.New_price,
        m.[Difference], m.Cheapest, m.Airline, m.Aircode, m.Cabin, m.[Days],
        m.Stops, m.web, m.IsTargetFound, m.NewUploadDate, m.DateNewPriceChanged, ai.photo,
-       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal
+       m.IsOldTarget, m.IsMonthTarget, m.IsTargetDeal, m.IsTargetDealOld
 FROM MatchedFromCities m left join airlinex ai on m.Airline = ai.Airline
 WHERE m.[From] in (SELECT[FROM] from MatchedToCities) AND m.[To] in (SELECT[TO] from MatchedToCities)
 AND (m.Aircode = @Aircode OR @Aircode = '') AND (m.Days = CONCAT(@Days, ' Nights') OR m.Days = @Days OR @Days = '')

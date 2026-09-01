@@ -426,9 +426,11 @@ namespace aire
                         double oldPrice   = Convert.ToDouble(row.Cells[4].Value);
                         double newPrice   = Convert.ToDouble(row.Cells[5].Value);
 
-                        // New price (no previous): OLD=0, NEW>0 — always Grey regardless of diff
+                        // New deal (no previous price): OLD=0, NEW>0 — Cyan regardless of diff.
+                        // Kept distinct from Grey (route gone) and from Orange, which the row
+                        // background uses for IsTargetDealOld.
                         if (oldPrice == 0 && newPrice > 0)
-                            row.Cells[8].Style.BackColor = Color.Gray;
+                            row.Cells[8].Style.BackColor = Color.Cyan;
                         // Old price only (removed): OLD>0, NEW=0 — Grey
                         else if (oldPrice > 0 && newPrice == 0)
                             row.Cells[8].Style.BackColor = Color.Gray;
