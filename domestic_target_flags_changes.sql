@@ -2,6 +2,12 @@
 -- domestic_target_flags_changes.sql
 -- Run this in SSMS against DB_A61545_andycom
 --
+-- NOTE: this file uses GO batch separators, which only SSMS and sqlcmd
+-- understand. Other tools (web SQL consoles, anything going through
+-- OLE DB / ADO) fail with "Incorrect syntax near 'GO'". For those, use
+-- the GO-free split scripts in aire/client_sql/domestic_targets/ and run
+-- them in numbered order 01 to 09.
+--
 -- PART A: "new deal" fix - a route with no old price must not be reported
 --          as a price rise (Difference must be 0, not New_price)
 -- PART B: full target categorisation (Blue / Yellow / Purple / Green / Orange)
