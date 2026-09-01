@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -458,120 +458,148 @@ namespace aire
 			}
 		}
 
-        private void button8_Click(object sender, EventArgs e)
+        private static readonly string connBobs  = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
+        private static readonly string connAdmin = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
+
+        // STEP 1 — Transfer admin data into comprGOOGLAirline_Staging on Bob's DB.
+        // The live comprGOOGLAirline table (and the website) is untouched during this.
+        // When done, click Publish (button9_2) to go live instantly.
+        private async void button8_Click(object sender, EventArgs e)
         {
-            int y = 0;
-         
-                button8.Enabled = false;
-                int x = 0;
-                List<classGFAirlineNEW> Dataset = new List<classGFAirlineNEW>();
-                // Database connections
-                string connNEWStr1 = "Data Source=SQL8010.site4now.net;Initial Catalog=db_a61545_bobs;User Id=db_a61545_bobs_admin;Password=b0bsfl1gh7;";
-                string connOLDStr2 = "Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;";
-                IDbConnection db2 = new SqlConnection(connNEWStr1);
-                using (SqlConnection connNew = new SqlConnection(connNEWStr1))
-                using (SqlConnection connOLD = new SqlConnection(connOLDStr2))
+            button8.Enabled = false;
+            label8.Text = "Starting transfer to staging...";
+            label1.Text = "";
+
+            try
+            {
+                await Task.Run(() =>
                 {
-                    connNew.Open();
-                    connOLD.Open();
-                   
-                    string Query = $"TRUNCATE TABLE  comprGOOGLAirline ";
-                    SqlCommand cmd12 = new SqlCommand(Query, connNew);
-                cmd12.CommandTimeout = 120; // 2 minutes for truncate operation
-                    cmd12.ExecuteNonQuery();
-
-
-                Query = $"SELECT  count(*) FROM comprGOOGLAirline ";
-                SqlCommand cmd13 = new SqlCommand(Query, connOLD);
-                var Count = cmd13.ExecuteScalar();
-
-                Query = $"SELECT  * FROM comprGOOGLAirline";
-
-
-
-                    if (int.Parse(Count.ToString()) > 0)
+                    using (SqlConnection connOLD = new SqlConnection(connAdmin))
+                    using (SqlConnection connNew = new SqlConnection(connBobs))
                     {
-                     
-                        SqlCommand cOld = new SqlCommand(Query, connOLD);
+                        connOLD.Open();
+                        connNew.Open();
 
+                        long totalRows = 0;
+                        using (SqlCommand cmdCount = new SqlCommand("SELECT COUNT(*) FROM comprGOOGLAirline", connOLD))
+                            totalRows = (int)cmdCount.ExecuteScalar();
 
-
+                        if (totalRows == 0)
                         {
-
-                            using (SqlDataReader reader = cOld.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    classGFAirlineNEW line = new classGFAirlineNEW();
-                                    // Assuming you want to display some columns from the table, e.g., id and some other column
-                                    line.id = int.Parse(reader["id"].ToString());
-                                    line.oldid = int.Parse(reader["id"].ToString());
-                                    line.From = reader["From"].ToString();
-                                    line.To = reader["To"].ToString();
-                                    line.citys = reader["citys"].ToString();
-                                    line.Dates = DateTime.Parse(reader["Dates"].ToString());
-                                    line.Olde_price = double.Parse(reader["Olde_price"].ToString());
-                                    line.New_price = double.Parse(reader["New_price"].ToString());
-                                    line.Difference = double.Parse(reader["Difference"].ToString());
-                                    line.Cheapest = double.Parse(reader["Cheapest"].ToString());
-                                    line.Airline = reader["Airline"].ToString();
-                                    line.Aircode = reader["Aircode"].ToString();
-                                    line.Cabin = reader["Cabin"].ToString();
-                                    line.Days = reader["Days"].ToString();
-                                    line.Stops = reader["stops"].ToString();
-                                    line.web = reader["web"].ToString();
-                                    line.IsTargetFound = bool.Parse(reader["IsTargetFound"].ToString());
-                                    line.Name = reader["name"].ToString();
-                                    line.NewUploadDate = DateTime.Parse(reader["NewUploadDate"].ToString());
-                                    line.OtaDiscount = double.Parse(reader["OtaDiscount"].ToString());
-                                    line.OtaTotal = double.Parse(reader["OtaTotal"].ToString());
-
-                                    Dataset.Add(line);
-
-
-
-
-
-                                    x++;
-                                label8.Text = "Transferring: " + x.ToString() + "/" + Count.ToString();
-                                if (x % 5000 == 0)
-                                    {
-                                        db2.BulkInsert(Dataset);
-                                        Application.DoEvents();
-                                        Dataset.Clear();
-
-
-                                    }
-
-
-
-                                }
-
-
-
-                                if (Dataset.Count > 0)
-                                {  
-                                    db2.BulkInsert(Dataset);
-                                    Application.DoEvents();
-                                    Dataset.Clear();
-                                    label1.Text = "Done!";
-
-
-                                }
-
-
-                            }
-
+                            this.Invoke((MethodInvoker)(() => label8.Text = "No rows to transfer."));
+                            return;
                         }
 
+                        // Truncate STAGING only — live table is untouched
+                        using (SqlCommand cmdTrunc = new SqlCommand("TRUNCATE TABLE comprGOOGLAirline_Staging", connNew))
+                        {
+                            cmdTrunc.CommandTimeout = 120;
+                            cmdTrunc.ExecuteNonQuery();
+                        }
 
+                        // Get staging column names so we only map columns that exist there
+                        var destColumns = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        using (SqlCommand cmdSchema = new SqlCommand("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'comprGOOGLAirline_Staging'", connNew))
+                        using (SqlDataReader schemaReader = cmdSchema.ExecuteReader())
+                            while (schemaReader.Read())
+                                destColumns.Add(schemaReader.GetString(0));
+
+                        using (SqlCommand cmdSrc = new SqlCommand("SELECT * FROM comprGOOGLAirline", connOLD))
+                        {
+                            cmdSrc.CommandTimeout = 0;
+                            using (SqlDataReader reader = cmdSrc.ExecuteReader())
+                            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connNew))
+                            {
+                                bulkCopy.DestinationTableName = "comprGOOGLAirline_Staging";
+                                bulkCopy.BatchSize = 10000;
+                                bulkCopy.BulkCopyTimeout = 0;
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string col = reader.GetName(i);
+                                    if (destColumns.Contains(col))
+                                        bulkCopy.ColumnMappings.Add(col, col);
+                                }
+
+                                bulkCopy.NotifyAfter = 10000;
+                                long transferred = 0;
+                                bulkCopy.SqlRowsCopied += (s, ev) =>
+                                {
+                                    transferred = ev.RowsCopied;
+                                    this.Invoke((MethodInvoker)(() =>
+                                        label8.Text = "Transferring: " + transferred.ToString("N0") + " / " + totalRows.ToString("N0")));
+                                };
+
+                                bulkCopy.WriteToServer(reader);
+                            }
+                        }
                     }
-                }
-                // timer1.Enabled = true;
-                button8.Enabled = true;
-            
+                });
 
-           
+                label8.Text = "Transfer to staging complete! Click Publish to go live.";
+                label1.Text = "Ready to publish.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Transfer error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label8.Text = "Transfer failed.";
+            }
+            finally
+            {
+                button8.Enabled = true;
+            }
+        }
+
+        // STEP 2 — Publish staging to live.
+        // Phase 1: Builds indexes on staging (few mins, website still live).
+        // Phase 2: Instant rename swap — staging becomes the live table.
+        // Phase 3: Drops old table, recreates empty staging for next upload.
+        public async void PublishStagingToLive()
+        {
+            var confirm = MessageBox.Show(
+                "This will publish the staged data to the live website.\n\n" +
+                "Phase 1: Build indexes on staging (~5 mins, website unaffected).\n" +
+                "Phase 2: Instant swap — website reads new data immediately.\n\n" +
+                "Continue?",
+                "Publish to Live", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes) return;
+
+            button8.Enabled = false;
+            label8.Text = "Publishing: building indexes on staging...";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (SqlConnection connNew = new SqlConnection(connBobs))
+                    {
+                        connNew.Open();
+                        using (SqlCommand cmd = new SqlCommand("EXEC PublishStagingToLive", connNew))
+                        {
+                            cmd.CommandTimeout = 0;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                });
+
+                label8.Text = "Publish complete! Website is now live with new data.";
+                label1.Text = "Published!";
+                MessageBox.Show("Website is now live with the new data.", "Publish Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Publish error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label8.Text = "Publish failed.";
+            }
+            finally
+            {
+                button8.Enabled = true;
+            }
+        }
+        private void button9_Click(object sender, EventArgs e)
+        {
+            PublishStagingToLive();
         }
 
         private void label7_Click(object sender, EventArgs e)
@@ -758,6 +786,9 @@ namespace aire
 							d.cmdd = new SqlCommand("exec UpdateIsFoundStatusForGFAirline", d.cn);
 							d.cmdd.CommandTimeout = processingTimeout;
 							d.cmdd.ExecuteNonQuery();
+
+							// Categorise all target colours: Yellow, Purple, Green, Orange
+							ClassTargetCategorization.CalculateAllTargetCategories(d.cn, ddlValue);
 						}
 						catch (SqlException ex)
 						{
@@ -796,31 +827,11 @@ namespace aire
 						}
 					});
 
-                // NEW: Calculate Target Categorizations (IsOldTarget, IsMonthTarget, TargetDeal)
-                // Run asynchronously to prevent UI blocking
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        ClassTargetCategorization.CalculateAllTargetCategories(d.cn, ddlValue);
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            MessageBox.Show("Target categorization completed successfully!");
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            MessageBox.Show("Target categorization error: " + ex.Message);
-                        });
-                    }
-					});
 
 					dt = null;
 					d.dt = null;
 					
-					MessageBox.Show("Finish! Data processing completed. Target categorization is running in the background.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					MessageBox.Show("Finish! Data processing and target categorisation complete.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				}
 
 				// Execute cleanup procedure if it exists (optional)

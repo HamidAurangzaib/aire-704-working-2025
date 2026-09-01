@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.button4 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
@@ -57,9 +60,42 @@
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
+            // button8 (Transfer to Bob's DB staging)
+            //
+            this.button8.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.button8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.button8.Location = new System.Drawing.Point(800, 693);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(148, 28);
+            this.button8.TabIndex = 100;
+            this.button8.Text = "Transfer to Bob's DB";
+            this.button8.UseVisualStyleBackColor = false;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            //
+            // button9 (Publish to Live)
+            //
+            this.button9.BackColor = System.Drawing.Color.DarkOrange;
+            this.button9.ForeColor = System.Drawing.Color.White;
+            this.button9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.button9.Location = new System.Drawing.Point(800, 731);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(148, 28);
+            this.button9.TabIndex = 101;
+            this.button9.Text = "Publish to Live";
+            this.button9.UseVisualStyleBackColor = false;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            //
+            // label8 (status)
+            //
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(440, 700);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(0, 16);
+            this.label8.TabIndex = 102;
+            //
             // button4
-            // 
+            //
             this.button4.BackColor = System.Drawing.Color.MediumSeaGreen;
             this.button4.Location = new System.Drawing.Point(1061, 731);
             this.button4.Margin = new System.Windows.Forms.Padding(4);
@@ -349,6 +385,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1200, 773);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.button9);
+            this.Controls.Add(this.button8);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.button7);
@@ -386,6 +425,9 @@
         #endregion
 
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.RadioButton radioButton2;
