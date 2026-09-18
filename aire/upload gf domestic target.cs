@@ -328,6 +328,35 @@ namespace aire
             comboBox2.SelectedItem = selectedValue;
         }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            string from    = textBox1.Text.Trim();
+            string to      = textBox2.Text.Trim();
+            string aircode = textBox3.Text.Trim();
+            string days    = comboBox2.Text.Trim();
+
+            string sql = "SELECT * FROM tblGfDomesticTarget WHERE 1=1";
+            if (from    != "") sql += " AND [From]  = '" + from    + "'";
+            if (to      != "") sql += " AND [To]    = '" + to      + "'";
+            if (aircode != "") sql += " AND Aircode = '" + aircode + "'";
+            // Days is stored as "4 day" here but "4 Nights" on the flight data,
+            // so match on the leading number only - the same way the target
+            // procedure does it.
+            if (days    != "") sql += " AND LEFT([Days], CHARINDEX(' ', [Days] + ' ') - 1) = '"
+                                      + new string(days.TakeWhile(char.IsDigit).ToArray()) + "'";
+
+            if (d.dt != null) d.dt.Rows.Clear();
+            d.ds = new DataSet();
+            d.da = new SqlDataAdapter(sql, d.cn);
+            d.da.Fill(d.ds, "tblGfDomesticTarget");
+            d.dt = d.ds.Tables["tblGfDomesticTarget"];
+            dataGridView1.DataSource = d.dt;
+            dataGridView1.Columns[0].Visible = false; // Hide the first column (ID column)
+
+            if (d.dt.Rows.Count == 0)
+                MessageBox.Show("No matching records found.");
+        }
+
         private void button5_Click(object sender, EventArgs e)
         {
             // Display a confirmation dialog

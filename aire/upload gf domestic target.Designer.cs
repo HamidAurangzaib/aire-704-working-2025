@@ -51,6 +51,7 @@
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -306,9 +307,21 @@
             this.button6.Text = "Update";
             this.button6.UseVisualStyleBackColor = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
+            //
+            // button7
+            //
+            this.button7.BackColor = System.Drawing.Color.LimeGreen;
+            this.button7.Location = new System.Drawing.Point(198, 339);
+            this.button7.Margin = new System.Windows.Forms.Padding(4);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(60, 28);
+            this.button7.TabIndex = 28;
+            this.button7.Text = "Search";
+            this.button7.UseVisualStyleBackColor = false;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            //
             // comboBox2
-            // 
+            //
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Location = new System.Drawing.Point(172, 281);
             this.comboBox2.Margin = new System.Windows.Forms.Padding(4);
@@ -337,6 +350,7 @@
             this.Controls.Add(this.label8);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.button6);
+            this.Controls.Add(this.button7);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.dateTimePicker2);
             this.Controls.Add(this.dateTimePicker1);
@@ -393,6 +407,7 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker2;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button button7;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label8;
     }
