@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using Z.Dapper.Plus;
 using ExcelDataReader;
@@ -234,6 +235,9 @@ namespace aire
 
         private void ddlName_SelectedIndexChanged(object sender, EventArgs e)
         {
+            topUpMode = false;
+            btnAddRoutes.Enabled = false;
+
             if (ddlName.SelectedIndex == 0)
             {
                 button3.Visible = false;
@@ -302,6 +306,9 @@ namespace aire
                 radioButton1.Enabled = false;
                 radioButton2.Enabled = false;
                 button3.Visible = true;
+                // Both files are in, so a whole new upload is not possible until
+                // the NEW one is rolled over. Topping up individual routes is.
+                btnAddRoutes.Enabled = true;
             }
         }
 
@@ -332,8 +339,35 @@ namespace aire
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
+            topUpMode = false;
             button1.Enabled = true;
             adrss = "googleFnewCOPY";
+        }
+
+        // Top-up: add routes that were missing from a NEW file that has already
+        // been uploaded, without having to load the whole file again.
+        bool topUpMode = false;
+
+        private void btnAddRoutes_Click(object sender, EventArgs e)
+        {
+            if (ddlName.SelectedIndex == 0)
+            {
+                MessageBox.Show("Please select an option from Name Dropdown.");
+                return;
+            }
+
+            topUpMode = true;
+            adrss = "googleFnewCOPY";
+            button1.Enabled = true;
+
+            MessageBox.Show(
+                "Adding routes to the NEW file of '" + ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString() + "'.\r\n\r\n" +
+                "1. Press ADD and pick the file with the missing routes\r\n" +
+                "2. Pick the sheet\r\n" +
+                "3. Press Upload\r\n\r\n" +
+                "Only the routes in that file are replaced. Everything else in the NEW file is left alone.\r\n" +
+                "Press Finish afterwards to rebuild the comparison.",
+                "Add routes", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -341,6 +375,11 @@ namespace aire
             if (ddlName.SelectedIndex == 0)
             {
                 MessageBox.Show("Please select an option from Name Dropdown.");
+                return;
+            }
+            if (topUpMode)
+            {
+                await AddRoutesToNewFile();
                 return;
             }
             label2.Visible = true;
@@ -390,6 +429,103 @@ namespace aire
             //label2.Visible = false;
             button2.Enabled = false;
         }
+        /// <summary>
+        /// Replaces just the routes contained in the chosen file inside the NEW
+        /// file for this Name, leaving the rest of the upload untouched. Safe to
+        /// run twice with the same file.
+        /// </summary>
+        private async Task AddRoutesToNewFile()
+        {
+            string name = ((DataRowView)ddlName.SelectedItem)["GFAirlineDDLName"].ToString();
+            List<ClassDomestic> rows = customerBindingSource.DataSource as List<ClassDomestic>;
+
+            if (rows == null || rows.Count == 0)
+            {
+                MessageBox.Show("Please pick a file and a sheet first.");
+                return;
+            }
+
+            // Only these route/stay combinations are touched.
+            var routes = rows.Select(r => new { r.From, r.To, r.Days, r.Stops }).Distinct().ToList();
+
+            string list = string.Join("\r\n", routes.Take(12)
+                .Select(r => "   " + r.From + " - " + r.To + "   " + r.Days + "   " + r.Stops + " stops"));
+            if (routes.Count > 12) list += "\r\n   ... and " + (routes.Count - 12) + " more";
+
+            if (MessageBox.Show(
+                    "Add " + rows.Count + " rows to the NEW file of '" + name + "'?\r\n\r\n" +
+                    "These routes will be replaced with what is in the file:\r\n" + list + "\r\n\r\n" +
+                    "Nothing else in the NEW file is changed.",
+                    "Add routes", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            label2.Visible = true;
+            button2.Enabled = false;
+            Cursor = Cursors.WaitCursor;
+
+            try
+            {
+                int removed = 0;
+
+                await Task.Run(() =>
+                {
+                    // Clear the same routes first, so re-uploading the file does
+                    // not leave two prices for one flight.
+                    foreach (var r in routes)
+                    {
+                        using (SqlCommand del = new SqlCommand(
+                            "DELETE FROM googleFnewCOPY WHERE [Name] = @Name AND [From] = @From " +
+                            "AND [To] = @To AND [Days] = @Days AND Stops = @Stops", d.cn))
+                        {
+                            del.CommandTimeout = 0;
+                            del.Parameters.AddWithValue("@Name", name);
+                            del.Parameters.AddWithValue("@From", (object)r.From ?? "");
+                            del.Parameters.AddWithValue("@To", (object)r.To ?? "");
+                            del.Parameters.AddWithValue("@Days", (object)r.Days ?? "");
+                            del.Parameters.AddWithValue("@Stops", (object)r.Stops ?? "");
+                            removed += del.ExecuteNonQuery();
+                        }
+                    }
+
+                    rows.ForEach(x =>
+                    {
+                        x.Name = name;
+                        x.NewUploadDate = DateTime.Now;
+                    });
+
+                    DapperPlusManager.Entity<ClassDomestic>().Table("googleFnewCOPY");
+                    using (IDbConnection db = new SqlConnection("Data Source=SQL5096.site4now.net;Initial Catalog=DB_A61545_andycom;User Id=DB_A61545_andycom_admin;Password=goodb0b5;"))
+                    {
+                        db.BulkInsert(rows);
+                    }
+                });
+
+                countRows();
+
+                MessageBox.Show(
+                    "Done.\r\n\r\n" +
+                    "Routes replaced: " + routes.Count + "\r\n" +
+                    "Rows removed:    " + removed + "\r\n" +
+                    "Rows added:      " + rows.Count + "\r\n\r\n" +
+                    "Now press Finish to rebuild the comparison.",
+                    "Routes added", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                // Deliberately no clean-up here. A failed normal upload wipes the
+                // whole file for this Name, which would throw away the rest of the
+                // data - a top-up must never do that.
+                MessageBox.Show("The routes were not added.\r\n\r\n" + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                label2.Visible = false;
+                Cursor = Cursors.Default;
+                topUpMode = false;
+            }
+        }
+
         int b = 0;
         string adrss;
         public void FunctionNameSkay(string str)
@@ -511,6 +647,7 @@ namespace aire
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
+            topUpMode = false;
             button1.Enabled = true;
             adrss = "googlef1oldCOPY";
         }

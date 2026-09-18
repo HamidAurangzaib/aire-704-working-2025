@@ -35,6 +35,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.btnAddRoutes = new System.Windows.Forms.Button();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.button3 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -137,7 +138,20 @@
             this.radioButton2.Text = "NEW";
             this.radioButton2.UseVisualStyleBackColor = false;
             this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
-            // 
+            //
+            // btnAddRoutes
+            //
+            this.btnAddRoutes.BackColor = System.Drawing.Color.Gold;
+            this.btnAddRoutes.Enabled = false;
+            this.btnAddRoutes.Location = new System.Drawing.Point(420, 638);
+            this.btnAddRoutes.Margin = new System.Windows.Forms.Padding(4);
+            this.btnAddRoutes.Name = "btnAddRoutes";
+            this.btnAddRoutes.Size = new System.Drawing.Size(240, 28);
+            this.btnAddRoutes.TabIndex = 83;
+            this.btnAddRoutes.Text = "Add Routes to NEW file";
+            this.btnAddRoutes.UseVisualStyleBackColor = false;
+            this.btnAddRoutes.Click += new System.EventHandler(this.btnAddRoutes_Click);
+            //
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
@@ -399,6 +413,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.radioButton2);
+            this.Controls.Add(this.btnAddRoutes);
             this.Controls.Add(this.radioButton1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label3);
@@ -431,6 +446,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.Button btnAddRoutes;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label label3;
